@@ -320,25 +320,7 @@
                 }
             });
         }
-
-        function showLocationInfo(location, marker, index) {
-            const content = `
-                <div class="info-window-content">
-                    <h3>${location.name}</h3>
-                    <p><strong>Endereço:</strong> ${location.address || 'Não informado'}</p>
-                    <p><strong>Detalhes:</strong> ${location.details || 'Não informado'}</p>
-                    ${location.phone ? `<p><strong>Telefone:</strong> ${location.phone}</p>` : ''}
-                    ${location.hours ? `<p><strong>Horário:</strong> ${location.hours}</p>` : ''}
-                    <button class="get-directions-btn" onclick="calculateRouteTo(${location.lat}, ${location.lng})">
-                        Como chegar
-                    </button>
-                </div>
-            `;
-            infoWindow.setContent(content);
-            infoWindow.open(map, marker);
-            highlightListItem(index);
-        }
-        
+      
         function highlightListItem(index) {
             document.querySelectorAll('#location-list li').forEach(item => {
                 item.classList.remove('active');
