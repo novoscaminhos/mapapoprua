@@ -26,6 +26,8 @@
             border-right: 1px solid #ddd;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
         }
         
         #sidebar-header {
@@ -83,12 +85,28 @@
             border-color: #4CAF50;
         }
 
+        /* Container para a lista e o painel de detalhes */
+        #sidebar-content-wrapper {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Lista de locais */
+        #location-list-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+
         #location-list {
             list-style-type: none;
             padding: 0;
             margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
         }
 
         #location-list li {
@@ -106,34 +124,84 @@
             background-color: #d4edda;
         }
 
+        /* NOVO: Painel de Detalhes */
+        #details-panel {
+            position: absolute;
+            top: 0;
+            left: 100%; /* Começa fora da tela, à direita */
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Estado ativo do painel de detalhes */
+        #sidebar.details-active #location-list-container {
+            transform: translateX(-100%); /* Move a lista para fora da tela */
+        }
+
+        #sidebar.details-active #details-panel {
+            transform: translateX(-100%); /* Move o painel de detalhes para a posição 0 */
+        }
+
+        /* Estilos do conteúdo do painel */
+        #details-panel h3 {
+            margin-top: 0;
+            color: #2E312F;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .detail-item strong {
+            display: block;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        #back-to-list-btn {
+            background: none;
+            border: none;
+            color: #4285F4;
+            padding: 0;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        #back-to-list-btn:hover {
+            text-decoration: underline;
+        }
+
+        #get-directions-btn-details {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        #get-directions-btn-details:hover {
+            background-color: #357ae8;
+        }
+
         /* Mapa */
         #map {
             flex-grow: 1;
             height: 100%;
-        }
-
-        /* Estilos para a janela de informações (InfoWindow ) */
-        .info-window-content {
-            max-width: 300px;
-        }
-        .info-window-content h3 {
-            margin: 0 0 10px 0;
-        }
-        .info-window-content p {
-            margin: 5px 0;
-        }
-        .get-directions-btn {
-            background-color: #4285F4;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .get-directions-btn:hover {
-            background-color: #357ae8;
         }
     </style>
 </head>
@@ -154,9 +222,37 @@
                 </div>
             </div>
 
-            <ul id="location-list">
-                <!-- A lista de locais será preenchida via JavaScript -->
-            </ul>
+            <div id="sidebar-content-wrapper">
+                <!-- Container da Lista de Locais -->
+                <div id="location-list-container">
+                    <ul id="location-list">
+                        <!-- A lista de locais será preenchida via JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- Painel de Detalhes do Local -->
+                <div id="details-panel">
+                    <button id="back-to-list-btn" onclick="hideDetailsPanel()">
+                        &#x25C0; Voltar para a Lista
+                    </button>
+                    <h3 id="detail-name"></h3>
+                    <div id="detail-category" class="detail-item"></div>
+                    <div id="detail-address" class="detail-item"></div>
+                    <div id="detail-details" class="detail-item"></div>
+                    <div id="detail-phone" class="detail-item"></div>
+                    <div id="detail-hours" class="detail-item"></div>
+                    
+                    <!-- Botão de Rota -->
+                    <button id="get-directions-btn-details">
+                        Como chegar a este local
+                    </button>
+
+                    <!-- Espaço para a Busca com IA (Passo 5) -->
+                    <div id="ai-info-section" class="detail-item">
+                        <!-- Conteúdo da IA será inserido aqui -->
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Onde o mapa será renderizado -->
@@ -184,11 +280,11 @@
         };
 
         let map;
-        let infoWindow;
         let directionsService;
         let directionsRenderer;
-        let locations = []; // A lista de locais será preenchida com os dados da planilha
+        let locations = [];
         const markers = [];
+        let activeLocation = null;
 
         // Função para carregar e parsear o CSV da Planilha Google
         async function loadDataFromSheet( ) {
@@ -204,7 +300,6 @@
                     const values = line.split(',');
                     let obj = {};
                     headers.forEach((header, i) => {
-                        // Remove aspas e espaços em branco
                         obj[header] = values[i] ? values[i].trim().replace(/^"|"$/g, '') : '';
                     });
                     // Converte lat/lng para números
@@ -213,7 +308,7 @@
                     return obj;
                 });
 
-                locations = data.filter(loc => loc.lat && loc.lng); // Filtra locais sem coordenadas válidas
+                locations = data.filter(loc => loc.lat && loc.lng);
                 console.log(`Dados carregados: ${locations.length} locais encontrados.`);
 
             } catch (error) {
@@ -222,13 +317,11 @@
             }
         }
 
-        // Função principal que agora é assíncrona
         async function initMap() {
             // 1. Carrega os dados da planilha antes de tudo
             await loadDataFromSheet();
 
             // 2. Inicializa o mapa
-            // Usamos o centro de Araraquara/SP como posição inicial
             const initialPosition = { lat: -21.7915, lng: -48.1739 };
 
             map = new google.maps.Map(document.getElementById("map"), {
@@ -238,7 +331,6 @@
                 streetViewControl: false
             });
 
-            infoWindow = new google.maps.InfoWindow();
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
             directionsRenderer.setMap(map);
@@ -272,15 +364,24 @@
                     animation: google.maps.Animation.DROP,
                     icon: categoryInfo ? categoryInfo.iconUrl : undefined
                 });
-                               // Evento de clique no marcador e na lista agora chama showDetailsPanel
+                markers.push(marker);
+
+                const listItem = document.createElement('li');
+                const categoryName = categoryInfo ? categoryInfo.name : 'Sem Categoria';
+                listItem.innerHTML = `<strong>${location.name}</strong>  
+<small>${location.address || categoryName}</small>`;
+                listItem.dataset.index = index;
+                locationList.appendChild(listItem);
+
+                // CORRIGIDO: Evento de clique no marcador e na lista agora chama showDetailsPanel
                 marker.addListener('click', () => {
-                    showDetailsPanel(location, marker, index); // <--- CORRETO: Chama o novo painel
+                    showDetailsPanel(location, marker, index);
                 });
 
                 listItem.addEventListener('click', () => {
-                    showDetailsPanel(location, marker, index); // <--- CORRETO: Chama o novo painel
+                    showDetailsPanel(location, marker, index);
                 });
-
+            });
 
             // 5. Adiciona eventos de filtro
             categoryFiltersContainer.addEventListener('click', (event) => {
@@ -293,7 +394,48 @@
 
             document.getElementById('search-box').addEventListener('keyup', filterLocations);
 
-            filterLocations(); // Chama o filtro na inicialização
+            // Evento para o botão "Como Chegar" no painel de detalhes
+            document.getElementById('get-directions-btn-details').addEventListener('click', () => {
+                if (activeLocation) {
+                    calculateRouteTo(activeLocation.lat, activeLocation.lng);
+                }
+            });
+
+            filterLocations();
+        }
+
+        // Função para mostrar o painel de detalhes
+        function showDetailsPanel(location, marker, index) {
+            const sidebar = document.getElementById('sidebar');
+            const categoryInfo = categories[location.category];
+            
+            // 1. Atualiza o conteúdo do painel
+            document.getElementById('detail-name').textContent = location.name;
+            document.getElementById('detail-category').innerHTML = `<strong>Categoria:</strong> ${categoryInfo ? categoryInfo.name : 'Não classificada'}`;
+            document.getElementById('detail-address').innerHTML = `<strong>Endereço:</strong> ${location.address || 'Não informado'}`;
+            document.getElementById('detail-details').innerHTML = `<strong>Detalhes:</strong> ${location.details || 'Nenhuma descrição disponível.'}`;
+            document.getElementById('detail-phone').innerHTML = location.phone ? `<strong>Telefone:</strong> ${location.phone}` : '';
+            document.getElementById('detail-hours').innerHTML = location.hours ? `<strong>Horário:</strong> ${location.hours}` : '';
+
+            // 2. Armazena o local ativo e centraliza o mapa
+            activeLocation = location;
+            map.panTo(marker.getPosition());
+            map.setZoom(15);
+
+            // 3. Adiciona a classe para a transição CSS
+            sidebar.classList.add('details-active');
+            
+            // 4. Destaca o item na lista
+            highlightListItem(index);
+        }
+
+        // Função para esconder o painel de detalhes
+        function hideDetailsPanel() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.remove('details-active');
+            activeLocation = null;
+            highlightListItem(-1); // Remove o destaque da lista
+            directionsRenderer.setDirections({ routes: [] }); // Limpa a rota, se houver
         }
 
         function filterLocations() {
@@ -320,7 +462,7 @@
                 }
             });
         }
-      
+
         function highlightListItem(index) {
             document.querySelectorAll('#location-list li').forEach(item => {
                 item.classList.remove('active');
@@ -349,8 +491,8 @@
                         directionsService.route(request, (result, status) => {
                             if (status == 'OK') {
                                 directionsRenderer.setDirections(result);
-                                infoWindow.close();
-                                highlightListItem(-1);
+                                // Não esconde o painel, apenas limpa o destaque da lista
+                                highlightListItem(-1); 
                             } else {
                                 window.alert('Não foi possível calcular a rota: ' + status);
                             }
