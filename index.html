@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Utilidade Pública</title>
+    <style>
+        /* Estilos para garantir o layout de tela cheia */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Evita barras de rolagem na página inteira */
+        }
+
+        #container {
+            display: flex;
+            height: 100vh; /* 100% da altura da tela */
+        }
+
+        /* Menu lateral */
+        #sidebar {
+            width: 350px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #sidebar-header {
+            padding: 20px;
+            background-color: #2E312F; /* Cor do seu mapa original */
+            color: white;
+            text-align: center;
+        }
+
+        #sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        #location-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto; /* Adiciona rolagem se a lista for longa */
+            flex-grow: 1;
+        }
+
+        #location-list li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+
+        #location-list li:hover {
+            background-color: #e9ecef;
+        }
+        
+        #location-list li.active {
+            background-color: #d4edda; /* Cor de destaque para o local ativo */
+        }
+
+        /* Mapa */
+        #map {
+            flex-grow: 1; /* Ocupa o restante do espaço */
+            height: 100%;
+        }
+
+        /* Estilos para a janela de informações (InfoWindow) */
+        .info-window-content {
+            max-width: 300px;
+        }
+        .info-window-content h3 {
+            margin: 0 0 10px 0;
+        }
+        .info-window-content p {
+            margin: 5px 0;
+        }
+        .get-directions-btn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .get-directions-btn:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <!-- Menu Lateral -->
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h2>Locais de Apoio</h2>
+            </div>
+            <ul id="location-list">
+                <!-- A lista de locais será preenchida via JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Onde o mapa será renderizado -->
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÃO DOS LOCAIS ---
+        // Para adicionar novos locais, basta adicionar um novo objeto a esta lista.
+        const locations = [
+            {
+                name: "Consultório na Rua",
+                lat: -22.90495,
+                lng: -43.18223,
+                address: "R. da Carioca, 10 - Centro, Rio de Janeiro",
+                details: "Equipe de saúde que atende a população em situação de rua no próprio local onde vivem.",
+                phone: "(21) 98765-4321",
+                hours: "Seg-Sex: 09:00 - 17:00"
+            },
+            {
+                name: "Abrigo Municipal",
+                lat: -22.91105,
+                lng: -43.20632,
+                address: "Av. Pres. Vargas, 1997 - Centro, Rio de Janeiro",
+                details: "Oferece pernoite, alimentação e higiene pessoal.",
+                phone: "(21) 12345-6789",
+                hours: "Aberto 24 horas"
+            },
+            {
+                name: "Centro de Referência de Assistência Social (CRAS)",
+                lat: -22.89567,
+                lng: -43.19234,
+                address: "R. da Alfândega, 112 - Centro, Rio de Janeiro",
+                details: "Porta de entrada para os serviços de assistência social do governo.",
+                phone: "(21) 55555-5555",
+                hours: "Seg-Sex: 08:00 - 18:00"
+            }
+            // Adicione mais locais aqui no mesmo formato
+        ];
+
+        let map;
+        let infoWindow;
+        let directionsService;
+        let directionsRenderer;
+        const markers = [];
+
+        function initMap() {
+            // Posição inicial do mapa (centro do Rio de Janeiro, por exemplo)
+            const initialPosition = { lat: -22.9068, lng: -43.1729 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: initialPosition,
+                mapTypeControl: false, // Opcional: remove o seletor de tipo de mapa
+                streetViewControl: false // Opcional: remove o boneco do Street View
+            });
+
+            infoWindow = new google.maps.InfoWindow();
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map); // Conecta o renderizador de rotas ao mapa
+
+            const locationList = document.getElementById('location-list');
+
+            // Cria os marcadores e a lista de locais
+            locations.forEach((location, index) => {
+                // Adiciona o marcador no mapa
+                const marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: location.name,
+                    animation: google.maps.Animation.DROP,
+                });
+                markers.push(marker);
+
+                // Adiciona o local na lista do menu lateral
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${location.name}</strong>  
+<small>${location.address}</small>`;
+                listItem.dataset.index = index;
+                locationList.appendChild(listItem);
+
+                // Evento de clique no marcador do mapa
+                marker.addListener('click', () => {
+                    showLocationInfo(location, marker, index);
+                });
+
+                // Evento de clique no item da lista
+                listItem.addEventListener('click', () => {
+                    showLocationInfo(location, marker, index);
+                    map.panTo(marker.getPosition()); // Centraliza o mapa no marcador
+                    map.setZoom(15);
+                });
+            });
+        }
+
+        function showLocationInfo(location, marker, index) {
+            // Conteúdo da janela de informações
+            const content = `
+                <div class="info-window-content">
+                    <h3>${location.name}</h3>
+                    <p><strong>Endereço:</strong> ${location.address}</p>
+                    <p><strong>Detalhes:</strong> ${location.details}</p>
+                    ${location.phone ? `<p><strong>Telefone:</strong> ${location.phone}</p>` : ''}
+                    ${location.hours ? `<p><strong>Horário:</strong> ${location.hours}</p>` : ''}
+                    <button class="get-directions-btn" onclick="calculateRouteTo(${location.lat}, ${location.lng})">
+                        Como chegar
+                    </button>
+                </div>
+            `;
+            infoWindow.setContent(content);
+            infoWindow.open(map, marker);
+            
+            // Destaca o item ativo na lista
+            highlightListItem(index);
+        }
+        
+        function highlightListItem(index) {
+            // Remove o destaque de todos os itens
+            document.querySelectorAll('#location-list li').forEach(item => {
+                item.classList.remove('active');
+            });
+            // Adiciona destaque ao item clicado
+            const activeItem = document.querySelector(`#location-list li[data-index='${index}']`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+        }
+
+        // Função para calcular e mostrar a rota
+        function calculateRouteTo(destLat, destLng) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const origin = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        
+                        const request = {
+                            origin: origin,
+                            destination: { lat: destLat, lng: destLng },
+                            travelMode: google.maps.TravelMode.WALKING // Padrão para pedestres, pode ser alterado para DRIVING
+                        };
+
+                        directionsService.route(request, (result, status) => {
+                            if (status == 'OK') {
+                                directionsRenderer.setDirections(result);
+                                infoWindow.close(); // Fecha a janela de informações para limpar a visão da rota
+                                highlightListItem(-1); // Remove destaque da lista
+                            } else {
+                                window.alert('Não foi possível calcular a rota: ' + status);
+                            }
+                        });
+                    },
+                    () => {
+                        alert('Não foi possível obter sua localização. Verifique as permissões do navegador.');
+                    }
+                );
+            } else {
+                alert('Seu navegador não suporta geolocalização.');
+            }
+        }
+
+        window.initMap = initMap;
+    </script>
+
+    <!-- Carrega a API do Google Maps -->
+    <!-- Substitua SUA_CHAVE_API pela chave que você possui -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTmQ_VAG5vGUroDiyn9mDOexOGPgUQlW8&callback=initMap"></script>
+
+</body>
+</html>
