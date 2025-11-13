@@ -142,12 +142,18 @@
             // A variável 'locations' vem do arquivo 'locations.js'
             locations.forEach((location, index) => {
                 // Adiciona o marcador no mapa
+                // Pega as informações da categoria do local
+                const categoryInfo = categories[location.category];
+
+                // Adiciona o marcador no mapa
                 const marker = new google.maps.Marker({
-                    position: { lat: location.lat, lng: location.lng },
-                    map: map,
-                    title: location.name,
-                    animation: google.maps.Animation.DROP,
-                });
+                  position: { lat: location.lat, lng: location.lng },
+                  map: map,
+                  title: location.name,
+                  animation: google.maps.Animation.DROP,
+                  icon: categoryInfo ? categoryInfo.iconUrl : undefined // Define o ícone com base na categoria
+            });
+
                 markers.push(marker);
 
                 // Adiciona o local na lista do menu lateral
