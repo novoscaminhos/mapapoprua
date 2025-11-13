@@ -272,26 +272,15 @@
                     animation: google.maps.Animation.DROP,
                     icon: categoryInfo ? categoryInfo.iconUrl : undefined
                 });
-                markers.push(marker);
-
-                const listItem = document.createElement('li');
-                // Exibe a categoria no item da lista
-                const categoryName = categoryInfo ? categoryInfo.name : 'Sem Categoria';
-                listItem.innerHTML = `<strong>${location.name}</strong>  
-<small>${location.address || categoryName}</small>`;
-                listItem.dataset.index = index;
-                locationList.appendChild(listItem);
-
+                               // Evento de clique no marcador e na lista agora chama showDetailsPanel
                 marker.addListener('click', () => {
-                    showLocationInfo(location, marker, index);
+                    showDetailsPanel(location, marker, index); // <--- CORRETO: Chama o novo painel
                 });
 
                 listItem.addEventListener('click', () => {
-                    showLocationInfo(location, marker, index);
-                    map.panTo(marker.getPosition());
-                    map.setZoom(15);
+                    showDetailsPanel(location, marker, index); // <--- CORRETO: Chama o novo painel
                 });
-            });
+
 
             // 5. Adiciona eventos de filtro
             categoryFiltersContainer.addEventListener('click', (event) => {
