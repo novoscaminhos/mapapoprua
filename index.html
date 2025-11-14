@@ -474,32 +474,54 @@
             sidebar.classList.remove('details-active');
             activeLocation = null;
             highlightListItem(-1); // Remove o destaque da lista
-            directionsRenderer.setDirections({ routes: [] }); // Limpa a rota, se houver
+            directionsRenderer.setDirections({ routes: [] }); // Limpa a rota
+            
+            // NOVO: Garante que todos os marcadores voltem a ser visíveis
+            markers.forEach(marker => marker.setVisible(true));
         }
 
-        function filterLocations() {
-            const activeCategoryElement = document.querySelector('.category-btn.active');
-            const activeCategory = activeCategoryElement ? activeCategoryElement.dataset.category : 'all';
-            const searchTerm = document.getElementById('search-box').value.toLowerCase();
+        function calculateRouteTo(destLat, destLng) {
+            // NOVO: Esconde todos os marcadores antes de calcular a rota
+            markers.forEach(marker => marker.setVisible(false));
 
-            locations.forEach((location, index) => {
-                const listItem = document.querySelector(`#location-list li[data-index='${index}']`);
-                const marker = markers[index];
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const origin = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        
+                        const request = {
+                            origin: origin,
+                            destination: { lat: destLat, lng: destLng },
+                            travelMode: google.maps.TravelMode.WALKING
+                        };
 
-                const categoryMatch = (activeCategory === 'all' || location.category === activeCategory);
-                const searchMatch = (
-                    location.name.toLowerCase().includes(searchTerm) ||
-                    location.address.toLowerCase().includes(searchTerm)
+                        directionsService.route(request, (result, status) => {
+                            if (status == 'OK') {
+                                directionsRenderer.setDirections(result);
+                                // O DirectionsRenderer já cuida de exibir o marcador de destino.
+                                // Apenas limpamos o destaque da lista.
+                                highlightListItem(-1); 
+                            } else {
+                                window.alert('Não foi possível calcular a rota: ' + status);
+                                // NOVO: Se falhar, reexibe todos os marcadores
+                                markers.forEach(marker => marker.setVisible(true));
+                            }
+                        });
+                    },
+                    () => {
+                        alert('Não foi possível obter sua localização. Verifique as permissões do navegador.');
+                        // NOVO: Se falhar, reexibe todos os marcadores
+                        markers.forEach(marker => marker.setVisible(true));
+                    }
                 );
-
-                if (categoryMatch && searchMatch) {
-                    listItem.style.display = '';
-                    if(marker) marker.setVisible(true);
-                } else {
-                    listItem.style.display = 'none';
-                    if(marker) marker.setVisible(false);
-                }
-            });
+            } else {
+                alert('Seu navegador não suporta geolocalização.');
+                // NOVO: Se falhar, reexibe todos os marcadores
+                markers.forEach(marker => marker.setVisible(true));
+            }
         }
 
         function highlightListItem(index) {
