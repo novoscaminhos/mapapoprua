@@ -124,7 +124,7 @@
             background-color: #d4edda;
         }
 
-        /* NOVO: Painel de Detalhes */
+        /* Painel de Detalhes */
         #details-panel {
             position: absolute;
             top: 0;
@@ -249,7 +249,12 @@
 
                     <!-- Espaço para a Busca com IA (Passo 5) -->
                     <div id="ai-info-section" class="detail-item">
-                        <!-- Conteúdo da IA será inserido aqui -->
+                        <button id="ai-search-btn" onclick="fetchAIInfo()">
+                            Buscar Detalhes com IA
+                        </button>
+                        <div id="ai-result" style="margin-top: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; display: none;">
+                            <!-- Resultado da IA será inserido aqui -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -373,7 +378,7 @@
                 listItem.dataset.index = index;
                 locationList.appendChild(listItem);
 
-                // CORRIGIDO: Evento de clique no marcador e na lista agora chama showDetailsPanel
+                // Evento de clique no marcador e na lista agora chama showDetailsPanel
                 marker.addListener('click', () => {
                     showDetailsPanel(location, marker, index);
                 });
@@ -404,11 +409,45 @@
             filterLocations();
         }
 
+        // Função para buscar informações com IA (Simulação)
+        async function fetchAIInfo() {
+            const aiButton = document.getElementById('ai-search-btn');
+            const aiResultDiv = document.getElementById('ai-result');
+            
+            if (!activeLocation) return;
+
+            // 1. Prepara a interface para a busca
+            aiButton.disabled = true;
+            aiButton.textContent = 'Buscando... (Isso pode levar alguns segundos)';
+            aiResultDiv.style.display = 'block';
+            aiResultDiv.innerHTML = 'Aguarde, a IA está pesquisando sobre: <strong>' + activeLocation.name + '</strong>...';
+
+            // 2. SIMULAÇÃO: Gerando um texto de exemplo
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Espera 3 segundos para simular a busca
+            
+            const aiText = `
+                <p><strong>Análise da IA:</strong></p>
+                <p>O local <strong>${activeLocation.name}</strong>, em ${activeLocation.address || 'Araraquara/SP'}, é um ponto vital na rede de apoio. A pesquisa de IA sugere que, além dos serviços básicos, o local tem sido destaque em iniciativas de reintegração social, com foco em oficinas de capacitação profissional. Verifique o site oficial da prefeitura para confirmar a agenda de eventos e doações.</p>
+                <p><em>(Esta é uma simulação. Para ter uma busca real, você precisará de um servidor intermediário.)</em></p>
+            `;
+
+            // 3. Exibe o resultado
+            aiResultDiv.innerHTML = aiText;
+            aiButton.disabled = false;
+            aiButton.textContent = 'Buscar Detalhes com IA';
+        }
+
         // Função para mostrar o painel de detalhes
         function showDetailsPanel(location, marker, index) {
             const sidebar = document.getElementById('sidebar');
             const categoryInfo = categories[location.category];
             
+            // Limpa o resultado da IA ao abrir um novo local
+            document.getElementById('ai-result').style.display = 'none';
+            document.getElementById('ai-result').innerHTML = '';
+            document.getElementById('ai-search-btn').disabled = false;
+            document.getElementById('ai-search-btn').textContent = 'Buscar Detalhes com IA';
+
             // 1. Atualiza o conteúdo do painel
             document.getElementById('detail-name').textContent = location.name;
             document.getElementById('detail-category').innerHTML = `<strong>Categoria:</strong> ${categoryInfo ? categoryInfo.name : 'Não classificada'}`;
@@ -491,7 +530,6 @@
                         directionsService.route(request, (result, status) => {
                             if (status == 'OK') {
                                 directionsRenderer.setDirections(result);
-                                // Não esconde o painel, apenas limpa o destaque da lista
                                 highlightListItem(-1); 
                             } else {
                                 window.alert('Não foi possível calcular a rota: ' + status);
@@ -511,7 +549,7 @@
     </script>
 
     <!-- Carrega a API do Google Maps e, ao terminar, chama a função initMap -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTmQ_VAG5vGUroDiyn9mDOexOGPgUQlW8&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD58BkxmI4P54X3VEMP_5hgwI19YDa7iis&callback=initMap"></script>
 
 </body>
 </html>
