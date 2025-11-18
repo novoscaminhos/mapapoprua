@@ -37,11 +37,13 @@
 
     <div class="controls">
       <div class="search">
+        <!-- Mantive o input (oculto via CSS) para não perder a integração futura -->
         <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
         <button id="btnClearSearch">✕</button>
       </div>
 
       <div class="search-bairro">
+        <!-- Mantido, oculto via CSS -->
         <input id="bairroBox" type="search" placeholder="Buscar por bairro..." />
       </div>
 
@@ -49,7 +51,7 @@
 
       <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
 
-      <button id="menuBtn" class="hamburger-btn">☰</button>
+      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">☰</button>
     </div>
   </div>
 </header>
@@ -71,9 +73,14 @@
   </section>
 </main>
 
-<!-- Painel de Detalhes -->
-<div id="detailsPanel" class="details-panel hidden">
-  <button id="closeDetails" class="close-details">✕</button>
+<!-- Painel de Detalhes (BOTTOM SHEET) -->
+<div id="detailsPanel" class="details-panel hidden" role="dialog" aria-hidden="true" aria-label="Detalhes do local">
+  <!-- Handle para arrastar -->
+  <div id="sheetHandle" class="sheet-handle" title="Arraste para cima para ver mais">
+    <div class="handle-bar"></div>
+  </div>
+
+  <button id="closeDetails" class="close-details" aria-label="Fechar">✕</button>
 
   <div class="details-content">
     <img id="detailsPhoto" class="details-photo" src="" alt="">
@@ -89,6 +96,13 @@
     <button id="routeBtn" class="route-btn">🧭 Ver rotas</button>
 
     <button id="detailsMoreBtn" class="details-more">Carregar mais detalhes</button>
+
+    <!-- Bloco extra oculto por padrão, será exibido ao clicar em "Carregar mais detalhes" -->
+    <div id="detailsExtraBlock" class="details-extra-block hidden">
+      <!-- Espaço para informações adicionais / futura integração -->
+      <p id="detailsExtraText">Informações adicionais serão exibidas aqui.</p>
+      <!-- Exemplo: links, histórico, contatos, observações -->
+    </div>
   </div>
 </div>
 
@@ -109,4 +123,3 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
