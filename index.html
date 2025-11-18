@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rede de Apoio — Araraquara / SP</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -13,9 +12,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
-        <!-- LOGO DO COMITÊ -->
         <img src="logo_comite.png" alt="Logo do Comitê" class="logo" />
-
         <div>
           <h1>Rede de Apoio — População em Situação de Rua</h1>
           <p class="subtitle">Araraquara / SP — locais de referência, apoio e doação</p>
@@ -25,40 +22,32 @@
       <div class="controls">
         <div class="search">
           <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
-          <button id="btnClearSearch" title="Limpar">✕</button>
+          <button id="btnClearSearch">✕</button>
         </div>
-        <div class="legend-toggle">
-          <button id="togglePanel" aria-expanded="true">Filtros ▾</button>
-        </div>
+
+        <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
+
+        <button id="togglePanel" class="filter-btn" aria-expanded="true">Filtros ▾</button>
       </div>
     </div>
   </header>
 
   <main class="container main-grid">
     <aside id="panel" class="panel">
+
       <h2>Filtros</h2>
-
-      <div id="filters" class="filters">
-        <!-- Populado pelo script -->
-      </div>
+      <div id="filters" class="filters"></div>
 
       <hr />
 
-      <div class="legend">
-        <h3>Legenda</h3>
-        <ul>
-          <li><span class="dot blue"></span> Serviços Públicos de Referência</li>
-          <li><span class="dot green"></span> Pontos de Apoio e Parcerias</li>
-          <li><span class="dot orange"></span> Pontos de doação</li>
-        </ul>
-      </div>
+      <h2>Lupa por Bairro / Endereço</h2>
+      <input id="bairroBox" class="bairro-input" type="search" placeholder="Digite o bairro..." />
 
       <hr />
 
-      <div class="info">
-        <p><strong>Contato:</strong> clbiffe@araraquara.sp.gov.br</p>
-        <p>Este mapa apresenta locais de referência, serviços, doações e parcerias.</p>
-      </div>
+      <h2>Locais</h2>
+      <div id="listaLocais" class="places-list"></div>
+
     </aside>
 
     <section class="map-section">
@@ -72,18 +61,13 @@
     </div>
   </footer>
 
-  <!-- Ordem correta dos scripts -->
+  <!-- seu script principal (substituir por versão abaixo) -->
   <script src="script.js"></script>
-
-  <!-- MarkerClusterer (carregado depois do script.js) -->
   <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 
-  <!-- Google Maps API (carregado por último sempre) -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxVq0rVgMGEkOAt2k_UhxhVNGg8BMp5gw&callback=initMap"
-    async
-    defer>
-  </script>
+  <!-- substitua YOUR_API_KEY pela sua chave real -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"
+    async defer></script>
 
 </body>
 </html>
