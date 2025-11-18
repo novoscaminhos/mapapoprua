@@ -7,22 +7,15 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Google Maps JS (replace YOUR_API_KEY_HERE) -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxVq0rVgMGEkOAt2k_UhxhVNGg8BMp5gw&callback=initMap"
-    async
-    defer
-  ></script>
-
-  <!-- MarkerClusterer (unpkg) -->
-  <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
-        <img src="" alt="" class="logo" aria-hidden="true" />
+        <!-- LOGO DO COMITÊ -->
+        <img src="logo_comite.png" alt="Logo do Comitê" class="logo" />
+
         <div>
           <h1>Rede de Apoio — População em Situação de Rua</h1>
           <p class="subtitle">Araraquara / SP — locais de referência, apoio e doação</p>
@@ -46,7 +39,7 @@
       <h2>Filtros</h2>
 
       <div id="filters" class="filters">
-        <!-- Checkboxes populated by script -->
+        <!-- Populado pelo script -->
       </div>
 
       <hr />
@@ -79,8 +72,18 @@
     </div>
   </footer>
 
-  <!-- App script -->
+  <!-- Ordem correta dos scripts -->
   <script src="script.js"></script>
+
+  <!-- MarkerClusterer (carregado depois do script.js) -->
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+
+  <!-- Google Maps API (carregado por último sempre) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxVq0rVgMGEkOAt2k_UhxhVNGg8BMp5gw&callback=initMap"
+    async
+    defer>
+  </script>
+
 </body>
 </html>
-
