@@ -6,11 +6,18 @@
   <title>Rede de Apoio — Araraquara / SP</title>
 
   <link rel="stylesheet" href="style.css" />
-</head>
 
+  <!-- MarkerClusterer -->
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+
+  <!-- Google Maps API (substituir YOUR_API_KEY) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"
+    async defer></script>
+</head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
+
       <div class="brand">
         <img src="logo_comite.png" alt="Logo do Comitê" class="logo" />
         <div>
@@ -20,39 +27,51 @@
       </div>
 
       <div class="controls">
+
+        <!-- Busca geral (nome, endereço, serviço) -->
         <div class="search">
           <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
           <button id="btnClearSearch">✕</button>
         </div>
 
+        <!-- Geolocalização -->
         <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
 
+        <!-- Toggle painel mobile -->
         <button id="togglePanel" class="filter-btn" aria-expanded="true">Filtros ▾</button>
+
       </div>
     </div>
   </header>
 
   <main class="container main-grid">
+
+    <!-- PAINEL LATERAL -->
     <aside id="panel" class="panel">
 
+      <!-- Filtros por categoria -->
       <h2>Filtros</h2>
       <div id="filters" class="filters"></div>
 
       <hr />
 
+      <!-- Lupa por bairro -->
       <h2>Lupa por Bairro / Endereço</h2>
       <input id="bairroBox" class="bairro-input" type="search" placeholder="Digite o bairro..." />
 
       <hr />
 
+      <!-- Lista de Locais -->
       <h2>Locais</h2>
       <div id="listaLocais" class="places-list"></div>
 
     </aside>
 
+    <!-- MAPA -->
     <section class="map-section">
       <div id="map" class="map"></div>
     </section>
+
   </main>
 
   <footer class="site-footer">
@@ -61,14 +80,7 @@
     </div>
   </footer>
 
-  <!-- seu script principal (substituir por versão abaixo) -->
+  <!-- SCRIPT PRINCIPAL -->
   <script src="script.js"></script>
-  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
-
-  <!-- substitua YOUR_API_KEY pela sua chave real -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"
-    async defer></script>
-
 </body>
 </html>
-
