@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rede de Apoio — Araraquara / SP</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Google Maps JS (replace YOUR_API_KEY_HERE) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"
+    async
+    defer
+  ></script>
+
+  <!-- MarkerClusterer (unpkg) -->
+  <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="" alt="" class="logo" aria-hidden="true" />
+        <div>
+          <h1>Rede de Apoio — População em Situação de Rua</h1>
+          <p class="subtitle">Araraquara / SP — locais de referência, apoio e doação</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="search">
+          <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
+          <button id="btnClearSearch" title="Limpar">✕</button>
+        </div>
+        <div class="legend-toggle">
+          <button id="togglePanel" aria-expanded="true">Filtros ▾</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-grid">
+    <aside id="panel" class="panel">
+      <h2>Filtros</h2>
+
+      <div id="filters" class="filters">
+        <!-- Checkboxes populated by script -->
+      </div>
+
+      <hr />
+
+      <div class="legend">
+        <h3>Legenda</h3>
+        <ul>
+          <li><span class="dot blue"></span> Serviços Públicos de Referência</li>
+          <li><span class="dot green"></span> Pontos de Apoio e Parcerias</li>
+          <li><span class="dot orange"></span> Pontos de doação</li>
+        </ul>
+      </div>
+
+      <hr />
+
+      <div class="info">
+        <p><strong>Contato:</strong> clbiffe@araraquara.sp.gov.br</p>
+        <p>Este mapa apresenta locais de referência, serviços, doações e parcerias.</p>
+      </div>
+    </aside>
+
+    <section class="map-section">
+      <div id="map" class="map"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>&copy; 2025 Programa Novos Caminhos — Prefeitura de Araraquara</small>
+    </div>
+  </footer>
+
+  <!-- App script -->
+  <script src="script.js"></script>
+</body>
+</html>
