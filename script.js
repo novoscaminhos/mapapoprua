@@ -1,7 +1,6 @@
 /* ============================================================
    MAPA REDE DE APOIO — ARARAQUARA/SP
-   script.js — versão completa FINAL com bottom-sheet arrastável
-   (preserva todo o comportamento original e adiciona melhorias)
+   script.js — versão revisada e corrigida (substituição completa)
    ============================================================ */
 
 /* ---------------------- DADOS DO MAPA ---------------------- */
@@ -82,12 +81,20 @@ const categoryConfig = {
 };
 
 /* ---------------------- VARIÁVEIS GLOBAIS ---------------------- */
-let map, infoWindow, markers = [], markerCluster;
+let map;
+let infoWindow;
+let markers = [];
+let markerCluster = null;
 let userLocation = null;
 let userMarker = null;
 let selectedMarker = null;
 let previousMapCenter = null;
 let previousMapZoom = null;
+
+/* Elements cache */
+const detailsPanel = () => document.getElementById("detailsPanel");
+const sheetHandle = () => document.getElementById("sheetHandle");
+const detailsExtraBlock = () => document.getElementById("detailsExtraBlock");
 
 /* ---------------------- INICIALIZAÇÃO MAPA ---------------------- */
 function initMap() {
@@ -116,6 +123,12 @@ function initMap() {
 
 /* ---------------------- CRIAR MARCADORES ---------------------- */
 function createMarkers() {
+  // Remove antigos
+  if (markerCluster) {
+    try { markerCluster.clearMarkers(); } catch (e) {}
+    markerCluster = null;
+  }
+  markers.forEach(m => m.setMap(null));
   markers = [];
 
   for (const p of pontos) {
@@ -131,6 +144,7 @@ function createMarkers() {
       map
     });
 
+    // attach data
     marker._data = p;
     marker._category = p.category;
 
@@ -138,7 +152,10 @@ function createMarkers() {
     markers.push(marker);
   }
 
-  markerCluster = new markerClusterer.MarkerClusterer({ map, markers });
+  // Safe: instantiate cluster if we have markers
+  if (markers.length > 0) {
+    markerCluster = new markerClusterer.MarkerClusterer({ map, markers });
+  }
 }
 
 /* ---------------------- ÍCONE SVG ---------------------- */
@@ -155,27 +172,24 @@ function makeSvgPin(color) {
 /* ---------------------- FILTROS ---------------------- */
 function initFilters() {
   const box = document.getElementById("filters");
+  if (!box) return;
   box.innerHTML = "";
 
   Object.keys(categoryConfig).forEach(cat => {
     const id = slug(cat);
     const color = categoryConfig[cat].color;
 
-    box.innerHTML += `
-      <label class="filter-item">
-        <input type="checkbox" id="${id}" data-cat="${cat}" checked>
-        <span class="dot" style="background:${color}"></span> ${cat}
-      </label>
-    `;
+    const label = document.createElement("label");
+    label.className = "filter-item";
+    label.innerHTML = `<input type="checkbox" id="${id}" data-cat="${cat}" checked>
+                       <span class="dot" style="background:${color}"></span> ${cat}`;
+    box.appendChild(label);
   });
 
-document.querySelectorAll('.lista-item').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelector('.panel').classList.remove('open');
-    document.querySelector('.menu-overlay').classList.add('hidden');
+  // listeners
+  document.querySelectorAll("#filters input").forEach(chk => {
+    chk.addEventListener("change", applyFilters);
   });
-});
-
 }
 
 function applyFilters() {
@@ -184,8 +198,13 @@ function applyFilters() {
 
   markers.forEach(m => m.setVisible(active.includes(m._category)));
 
-  markerCluster.clearMarkers();
-  markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+  // rebuild cluster with visible markers
+  if (markerCluster) {
+    markerCluster.clearMarkers();
+    markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+  } else {
+    markerCluster = new markerClusterer.MarkerClusterer({ map, markers: markers.filter(m => m.getVisible()) });
+  }
 
   renderListaLocais();
 }
@@ -194,20 +213,21 @@ function applyFilters() {
 function initSearch() {
   const box = document.getElementById("searchBox");
   const clearBtn = document.getElementById("btnClearSearch");
-
-  if (!box) return;
+  if (!box || !clearBtn) return;
 
   box.addEventListener("input", () => {
     const q = box.value.toLowerCase();
 
     markers.forEach(m => {
       const d = m._data;
-      const hay = (d.name + " " + d.address + " " + d.details).toLowerCase();
+      const hay = (d.name + " " + (d.address || "") + " " + (d.details || "")).toLowerCase();
       m.setVisible(hay.includes(q));
     });
 
-    markerCluster.clearMarkers();
-    markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+    if (markerCluster) {
+      markerCluster.clearMarkers();
+      markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+    }
     renderListaLocais();
   });
 
@@ -227,8 +247,10 @@ function initBairroSearch() {
       const hay = (m._data.address || "").toLowerCase();
       m.setVisible(hay.includes(q));
     });
-    markerCluster.clearMarkers();
-    markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+    if (markerCluster) {
+      markerCluster.clearMarkers();
+      markerCluster.addMarkers(markers.filter(m => m.getVisible()));
+    }
     renderListaLocais();
   });
 }
@@ -240,6 +262,7 @@ function initListaLocais() {
 
 function renderListaLocais() {
   const box = document.getElementById("listaLocais");
+  if (!box) return;
   box.innerHTML = "";
 
   let vis = markers.filter(m => m.getVisible());
@@ -260,86 +283,116 @@ function renderListaLocais() {
 
     const item = document.createElement("div");
     item.className = "lista-item";
-    item.innerHTML = `<strong>${d.name}</strong><br><span>${d.category}${dist}</span>`;
+    item.innerHTML = `<strong>${escapeHtml(d.name)}</strong><br><span>${escapeHtml(d.category)}${dist}</span>`;
 
     item.addEventListener("click", () => {
+      // close menu if open
+      const panel = document.getElementById("panel");
+      const overlay = document.getElementById("menuOverlay");
+      if (panel && panel.classList.contains("open")) {
+        panel.classList.remove("open");
+        if (overlay) overlay.classList.add("hidden");
+      }
+
+      // pan to marker and open details compact
       map.panTo({ lat: d.lat, lng: d.lng });
       map.setZoom(16);
-      openDetailsPanel(m);
+
+      // find corresponding marker object
+      const marker = markers.find(mm => mm._data && mm._data.name === d.name && mm._data.lat === d.lat && mm._data.lng === d.lng);
+      if (marker) openDetailsPanel(marker);
     });
 
     box.appendChild(item);
   });
 }
 
-/* ---------------------- DETALHES ---------------------- */
+/* ---------------------- DETALHES (BOTTOM SHEET) ---------------------- */
 
-/* Estados do painel: 'closed', 'compact', 'mid', 'expanded' */
-const detailsPanelEl = document.getElementById ? document.getElementById("detailsPanel") : null;
-const sheetHandle = document.getElementById ? document.getElementById("sheetHandle") : null;
-const detailsExtraBlock = document.getElementById ? document.getElementById("detailsExtraBlock") : null;
-
+/* States: 'closed' | 'compact' | 'mid' | 'expanded' */
 function setPanelState(state) {
-  if (!detailsPanelEl) return;
- detailsPanel.classList.remove("state-mid", "state-expanded", "state-closed");
-detailsPanel.classList.add("state-compact");
+  const panel = detailsPanel();
+  if (!panel) return;
+
+  // cleanup any inline height to let CSS classes control visual
+  panel.style.height = "";
+  panel.classList.remove("state-closed", "state-compact", "state-mid", "state-expanded");
+
   switch (state) {
     case 'closed':
-      detailsPanelEl.classList.add("state-closed");
-      detailsPanelEl.classList.add("hidden");
-      detailsPanelEl.setAttribute("aria-hidden", "true");
+      panel.classList.add("state-closed");
+      panel.classList.add("hidden");
+      panel.setAttribute("aria-hidden", "true");
+      // restore body scroll
+      document.body.style.overflow = "";
       break;
     case 'compact':
-      detailsPanelEl.classList.remove("hidden");
-      detailsPanelEl.classList.add("state-compact");
-      detailsPanelEl.setAttribute("aria-hidden", "false");
+      panel.classList.remove("hidden");
+      panel.classList.add("state-compact");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "";
       break;
     case 'mid':
-      detailsPanelEl.classList.remove("hidden");
-      detailsPanelEl.classList.add("state-mid");
-      detailsPanelEl.setAttribute("aria-hidden", "false");
+      panel.classList.remove("hidden");
+      panel.classList.add("state-mid");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
       break;
     case 'expanded':
-      detailsPanelEl.classList.remove("hidden");
-      detailsPanelEl.classList.add("state-expanded");
-      detailsPanelEl.setAttribute("aria-hidden", "false");
+      panel.classList.remove("hidden");
+      panel.classList.add("state-expanded");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
       break;
     default:
-      detailsPanelEl.classList.add("state-compact");
-      detailsPanelEl.setAttribute("aria-hidden", "false");
+      panel.classList.add("state-compact");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "";
   }
 }
 
 /* Abre o painel e popula com dados do marker */
 function openDetailsPanel(marker) {
+  // guard: don't open details while side panel is open (avoid overlap)
+  const side = document.getElementById("panel");
+  if (side && side.classList.contains("open")) {
+    // close side panel first, allow map to show
+    const overlay = document.getElementById("menuOverlay");
+    side.classList.remove("open");
+    if (overlay) overlay.classList.add("hidden");
+    // small delay to let UI update
+    setTimeout(() => openDetailsPanel(marker), 180);
+    return;
+  }
+
   selectedMarker = marker;
 
   previousMapCenter = map.getCenter();
   previousMapZoom = map.getZoom();
 
-  const p = marker._data;
+  const p = marker._data || {};
 
   // Destacar marcador
   highlightMarker(marker);
 
-  document.getElementById("detailsName").textContent = p.name;
-  document.getElementById("detailsCategory").textContent = p.category;
+  // Populate content in the specified order:
+  // Title/Category -> Buttons -> Image -> Texts -> Extra block
+  document.getElementById("detailsName").textContent = p.name || "";
+  document.getElementById("detailsCategory").textContent = p.category || "";
   document.getElementById("detailsAddress").textContent = p.address || "";
   document.getElementById("detailsDetails").textContent = p.details || "";
   document.getElementById("detailsPhone").textContent = p.phone || "";
   document.getElementById("detailsHours").textContent = p.hours || "";
 
-  // Foto
-  fetch(p.photo)
-    .then(res => {
-      document.getElementById("detailsPhoto").src = res.ok ? p.photo : "placeholder.jpg";
-    })
-    .catch(() => {
-      document.getElementById("detailsPhoto").src = "placeholder.jpg";
-    });
+  // Photo: set src directly with onerror fallback
+  const photoEl = document.getElementById("detailsPhoto");
+  if (photoEl) {
+    photoEl.onerror = function () { this.src = "placeholder.jpg"; };
+    photoEl.src = p.photo || "placeholder.jpg";
+  }
 
-  // Distância
-  if (userLocation) {
+  // Distance
+  if (userLocation && p.lat && p.lng) {
     const dist = haversineDistance(
       userLocation.lat, userLocation.lng,
       p.lat, p.lng
@@ -350,16 +403,45 @@ function openDetailsPanel(marker) {
     document.getElementById("detailsDistance").textContent = "";
   }
 
-  // Rotas
-  document.getElementById("routeBtn").onclick = () => {
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`, "_blank");
-  };
+  // Route button
+  const routeBtn = document.getElementById("routeBtn");
+  if (routeBtn) {
+    routeBtn.onclick = () => {
+      if (p.lat && p.lng) {
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`, "_blank");
+      } else {
+        alert("Coordenadas não disponíveis.");
+      }
+    };
+  }
 
-  // Mostrar painel: iniciar em estado mid (intermediário)
-  setPanelState('mid');
+  // Ensure extra block hidden by default
+  const extra = detailsExtraBlock();
+  if (extra) {
+    extra.classList.add("hidden");
+    extra.style.display = "none";
+  }
+
+  // Set to compact first (single-line visible) and then nudge the map so the marker is visible
+  setPanelState('compact');
+
+  // Wait a bit for panel to render and then pan map so marker is visible above the panel
+  setTimeout(() => {
+    try {
+      // compute offset: move map up by approx half panel height
+      const panelEl = detailsPanel();
+      const panelHeight = (panelEl && panelEl.clientHeight) ? panelEl.clientHeight : window.innerHeight * 0.15;
+      // use panBy in pixels: negative to move up
+      // reduce a bit so marker isn't exactly at top
+      const offset = Math.round(panelHeight / 2.2);
+      map.panBy(0, -offset);
+    } catch (e) {
+      // ignore pan errors
+    }
+  }, 260);
 }
 
-/* Fechar painel */
+/* Fechar painel inicialização */
 function initDetailsPanel() {
   const closeBtn = document.getElementById("closeDetails");
   if (closeBtn) {
@@ -374,14 +456,16 @@ function initDetailsPanel() {
         map.panTo(previousMapCenter);
         map.setZoom(previousMapZoom);
       }
+      // cleanup
+      closePanelCleanup();
     });
   }
 
   // Botão "Carregar mais detalhes" revela bloco extra (C)
   const moreBtn = document.getElementById("detailsMoreBtn");
-  if (moreBtn && detailsExtraBlock) {
+  if (moreBtn) {
     moreBtn.addEventListener("click", () => {
-      const block = document.getElementById("detailsExtraBlock");
+      const block = detailsExtraBlock();
       if (!block) return;
       if (block.classList.contains("hidden")) {
         block.classList.remove("hidden");
@@ -404,11 +488,10 @@ function initDetailsPanel() {
 /* =======================
    Drag do painel de detalhes (touch + mouse)
    3 níveis: compact (pequeno), mid (médio), expanded (grande)
-   Com thresholds e física simples.
    ======================= */
 function initPanelDrag() {
-  const panel = document.getElementById("detailsPanel");
-  const handle = document.getElementById("sheetHandle");
+  const panel = detailsPanel();
+  const handle = sheetHandle();
   if (!panel || !handle) return;
 
   let startY = 0;
@@ -416,15 +499,8 @@ function initPanelDrag() {
   let dragging = false;
   let startHeight = 0;
 
-  // calcula altura baseada na janela para decidir snap
-  function decideStateFromTranslate(translate) {
-    // translate: negative quando arrasta pra cima
-    // vamos usar porcentagens relativas à altura da viewport
+  function decideStateFromHeight(heightPx) {
     const vh = window.innerHeight;
-    // converter translate em nova altura aproximada
-    const panelRect = panel.getBoundingClientRect();
-    // quando arrastando para cima, queremos maior altura (expanded)
-    const heightPx = panelRect.height - translate; // translate negativo => maior
     const ratio = heightPx / vh;
     if (ratio >= 0.75) return 'expanded';
     if (ratio >= 0.3) return 'mid';
@@ -435,32 +511,46 @@ function initPanelDrag() {
     dragging = true;
     startY = (e.touches ? e.touches[0].clientY : e.clientY);
     currentY = startY;
-    startHeight = panel.getBoundingClientRect().height;
+    startHeight = panel.getBoundingClientRect().height || (window.innerHeight * 0.15);
     panel.style.transition = 'none';
-    handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
+    // prevent accidental text selection
+    document.body.style.userSelect = 'none';
+    e.preventDefault && e.preventDefault();
   }
 
   function onMove(e) {
     if (!dragging) return;
     currentY = (e.touches ? e.touches[0].clientY : e.clientY);
     const dy = currentY - startY;
-    // Queremos mover visualmente o painel: limitar movimento
-    // Ao arrastar pra cima, dy < 0 -> aumentar altura
-    // Ao arrastar pra baixo, dy > 0 -> reduzir altura
-    const newHeight = Math.max(100, startHeight - dy); // mínimo 100px
+    // newHeight = startHeight - dy (because dragging up decreases clientY)
+    const newHeight = Math.max(80, startHeight - dy);
     panel.style.height = newHeight + 'px';
   }
 
   function onEnd(e) {
     if (!dragging) return;
     dragging = false;
-    panel.style.transition = ''; // volta transição
-    // decidir snap
-    const dyTotal = currentY - startY;
-    const snap = decideStateFromTranslate(dyTotal);
+    panel.style.transition = ''; // restore transition
+    document.body.style.userSelect = '';
+
+    // determine snapped state
+    const finalHeight = parseInt(panel.style.height || panel.getBoundingClientRect().height, 10);
+    const snap = decideStateFromHeight(finalHeight);
+
+    // if user dragged down enough from compact -> close entirely
+    // compute delta:
+    const delta = currentY - startY;
+    if (delta > 140 && (panel.classList.contains('state-compact') || snap === 'compact')) {
+      // close panel
+      setPanelState('closed');
+      panel.style.height = "";
+      return;
+    }
+
+    // apply snapped state
     setPanelState(snap);
 
-    // se o painel estiver aberto em mid/expanded, bloquear o scroll do body
+    // block body scrolling if necessary
     if (snap === 'expanded' || snap === 'mid') {
       document.body.style.overflow = 'hidden';
     } else {
@@ -469,8 +559,8 @@ function initPanelDrag() {
   }
 
   // touch events
-  handle.addEventListener('touchstart', onStart, {passive:true});
-  handle.addEventListener('touchmove', onMove, {passive:false});
+  handle.addEventListener('touchstart', onStart, { passive: false });
+  handle.addEventListener('touchmove', onMove, { passive: false });
   handle.addEventListener('touchend', onEnd);
 
   // mouse events
@@ -478,18 +568,19 @@ function initPanelDrag() {
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onEnd);
 
-  // clique rápido alterna entre compacto -> mid -> expanded (facilidade)
+  // quick click toggles state (if not dragged)
   handle.addEventListener('click', (ev) => {
-    // se foi um clique sem arraste
+    // if was a drag, ignore click
     if (Math.abs(currentY - startY) > 8) return;
-    // alterna
-    const isClosed = panel.classList.contains('hidden') || panel.classList.contains('state-closed');
+    const panelEl = detailsPanel();
+    if (!panelEl) return;
+    const isClosed = panelEl.classList.contains('hidden') || panelEl.classList.contains('state-closed');
     if (isClosed) {
       setPanelState('compact');
       return;
     }
-    if (panel.classList.contains('state-compact')) setPanelState('mid');
-    else if (panel.classList.contains('state-mid')) setPanelState('expanded');
+    if (panelEl.classList.contains('state-compact')) setPanelState('mid');
+    else if (panelEl.classList.contains('state-mid')) setPanelState('expanded');
     else setPanelState('compact');
   });
 }
@@ -502,13 +593,15 @@ function closePanelCleanup() {
 /* ---------------------- HIGHLIGHT ---------------------- */
 function highlightMarker(marker) {
   markers.forEach(m => {
-    if (m === marker) {
-      m.setOpacity(1);
-      m.setAnimation(google.maps.Animation.BOUNCE);
-      setTimeout(() => m.setAnimation(null), 800);
-    } else {
-      m.setOpacity(0.25);
-    }
+    try {
+      if (m === marker) {
+        m.setOpacity(1);
+        m.setAnimation && m.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => m.setAnimation && m.setAnimation(null), 800);
+      } else {
+        m.setOpacity && m.setOpacity(0.25);
+      }
+    } catch (e) { /* ignore */ }
   });
 }
 
@@ -568,54 +661,69 @@ function initNearbyBtn() {
       );
     });
 
-    markers.sort((a, b) => a._distance - b._distance);
-
-    fitToMarkers(markers.slice(0, 5));
+    const sorted = markers.slice().sort((a, b) => a._distance - b._distance);
+    fitToMarkers(sorted.slice(0, 5));
 
     renderListaLocais();
   });
 }
 
-/* ---------------------- MENU MOBILE SLIDE + ANIMAÇÃO ONBOARDING ---------------------- */
+/* ---------------------- MENU MOBILE SLIDE + ONBOARD ANIM ---------------------- */
 function initHamburgerMenu() {
   const btn = document.getElementById("menuBtn");
-  const panel = document.getElementById("panel");
+  const sidePanel = document.getElementById("panel");
   const overlay = document.getElementById("menuOverlay");
 
-  if (!btn || !panel || !overlay) return;
+  if (!btn || !sidePanel || !overlay) return;
+
+  function openMenu() {
+    sidePanel.classList.add("open");
+    overlay.classList.remove("hidden");
+  }
+  function closeMenu() {
+    sidePanel.classList.remove("open");
+    overlay.classList.add("hidden");
+  }
 
   btn.addEventListener("click", () => {
-    panel.classList.add("open");
-    overlay.classList.remove("hidden");
+    if (sidePanel.classList.contains("open")) closeMenu();
+    else openMenu();
   });
 
   overlay.addEventListener("click", () => {
-    panel.classList.remove("open");
-    overlay.classList.add("hidden");
+    closeMenu();
   });
 
-  // Onboarding: animação sutil abrindo e fechando o painel uma vez
+  // Onboarding: animação uma vez
   try {
     const key = 'mapapoprua_menu_onboard_v2';
     if (!localStorage.getItem(key)) {
       setTimeout(() => {
-        // abrir
-        panel.classList.add("open");
-        overlay.classList.remove("hidden");
+        openMenu();
         setTimeout(() => {
-          // fechar
-          panel.classList.remove("open");
-          overlay.classList.add("hidden");
+          closeMenu();
           localStorage.setItem(key, '1');
         }, 820);
       }, 520);
     }
-  } catch (e) { /* se localStorage travar, ignora */ }
+  } catch (e) { /* ignore */ }
+
+  // Ensure clicking a lista-item closes the side panel (delegation)
+  const listaBox = document.getElementById("listaLocais");
+  if (listaBox) {
+    listaBox.addEventListener("click", (ev) => {
+      const el = ev.target.closest(".lista-item");
+      if (!el) return;
+      // close side panel
+      closeMenu();
+      // allow the existing click handler on item to run (we used renderListaLocais to attach)
+    });
+  }
 }
 
 /* ---------------------- AJUDARES ---------------------- */
 function fitToMarkers(list = markers) {
-  if (!markers || markers.length === 0) return;
+  if (!map || !markers || markers.length === 0) return;
   const bounds = new google.maps.LatLngBounds();
   list.forEach(m => bounds.extend(m.getPosition()));
   map.fitBounds(bounds);
@@ -638,6 +746,17 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/* ---------------------- UTIL ---------------------- */
+function escapeHtml(unsafe) {
+  if (unsafe === undefined || unsafe === null) return "";
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 /* =======================
    Export helpers para console / outro script usar
    ======================= */
@@ -648,18 +767,11 @@ window.mapapoprua = {
 };
 
 /* =======================
-   DOMContentLoaded: pequenos setups (inserir lista se vazia)
+   DOMContentLoaded: setups iniciais
    ======================= */
 document.addEventListener('DOMContentLoaded', () => {
-  // Caso a lista esteja vazia no carregamento, renderiza itens de exemplo (igual antes)
-  const listEl = document.getElementById("listaLocais");
-  if (listEl && listEl.children.length === 0) {
-    // reproduz a mesma lógica do initListaLocais
-    // renderListaLocais será chamada no initMap após markers criados
-  }
-
   // Garante que blocos extras iniciem escondidos
-  const extra = document.getElementById("detailsExtraBlock");
+  const extra = detailsExtraBlock();
   if (extra) {
     extra.classList.add("hidden");
     extra.style.display = "none";
@@ -667,6 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // garante comportamento do painel fechado inicialmente
   setPanelState('closed');
+
+  // If map already inited, initMap() will be called by Google callback.
+  // Otherwise, in testing environments you can call initMap() manually.
 });
-
-
