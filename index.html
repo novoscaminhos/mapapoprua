@@ -7,81 +7,87 @@
 
   <link rel="stylesheet" href="style.css" />
 
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap" async defer></script>
+
   <!-- MarkerClusterer -->
   <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
-
-  <!-- Google Maps API (substituir YOUR_API_KEY) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"
-    async defer></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
 
-      <div class="brand">
-        <img src="logo_comite.png" alt="Logo do Comitê" class="logo" />
-        <div>
-          <h1>Rede de Apoio — População em Situação de Rua</h1>
-          <p class="subtitle">Araraquara / SP — locais de referência, apoio e doação</p>
-        </div>
-      </div>
+<header class="site-header">
+  <div class="container header-inner">
 
-      <div class="controls">
-
-        <!-- Busca geral (nome, endereço, serviço) -->
-        <div class="search">
-          <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
-          <button id="btnClearSearch">✕</button>
-        </div>
-
-        <!-- Geolocalização -->
-        <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
-
-        <!-- Toggle painel mobile -->
-        <button id="togglePanel" class="filter-btn" aria-expanded="true">Filtros ▾</button>
-
+    <div class="brand">
+      <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
+      <div>
+        <h1>Rede de Apoio — População em Situação de Rua</h1>
+        <p class="subtitle">Araraquara / SP — Serviços, apoio e doações</p>
       </div>
     </div>
-  </header>
 
-  <main class="container main-grid">
+    <div class="controls">
+      <div class="search">
+        <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
+        <button id="btnClearSearch">✕</button>
+      </div>
 
-    <!-- PAINEL LATERAL -->
-    <aside id="panel" class="panel">
+      <div class="search-bairro">
+        <input id="bairroBox" type="search" placeholder="Buscar por bairro..." />
+      </div>
 
-      <!-- Filtros por categoria -->
-      <h2>Filtros</h2>
-      <div id="filters" class="filters"></div>
+      <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
 
-      <hr />
-
-      <!-- Lupa por bairro -->
-      <h2>Lupa por Bairro / Endereço</h2>
-      <input id="bairroBox" class="bairro-input" type="search" placeholder="Digite o bairro..." />
-
-      <hr />
-
-      <!-- Lista de Locais -->
-      <h2>Locais</h2>
-      <div id="listaLocais" class="places-list"></div>
-
-    </aside>
-
-    <!-- MAPA -->
-    <section class="map-section">
-      <div id="map" class="map"></div>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <small>&copy; 2025 Programa Novos Caminhos — Prefeitura de Araraquara</small>
+      <button id="togglePanel" class="panel-toggle">Filtros ▾</button>
     </div>
-  </footer>
+  </div>
+</header>
 
-  <!-- SCRIPT PRINCIPAL -->
-  <script src="script.js"></script>
+<main class="container main-grid">
+  
+  <!-- Painel lateral -->
+  <aside id="panel" class="panel">
+
+    <h2>Filtros</h2>
+    <div id="filters" class="filters"></div>
+
+    <hr />
+
+    <h2>Lista de Locais</h2>
+    <div id="listaLocais" class="lista"></div>
+
+  </aside>
+
+  <!-- MAPA -->
+  <section class="map-section">
+    <div id="map" class="map"></div>
+  </section>
+</main>
+
+<!-- Painel de Detalhes (tipo Google Maps) -->
+<div id="detailsPanel" class="details-panel hidden">
+  <button id="closeDetails" class="close-details">✕</button>
+
+  <div class="details-content">
+    <img id="detailsPhoto" class="details-photo" src="" alt="">
+    <h2 id="detailsName"></h2>
+    <p id="detailsCategory"></p>
+    <p id="detailsAddress"></p>
+    <p id="detailsDetails"></p>
+    <p id="detailsPhone"></p>
+    <p id="detailsHours"></p>
+    <p id="detailsDistance"></p>
+
+    <button id="detailsMoreBtn" class="details-more">Carregar mais detalhes</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <small>&copy; 2025 Prefeitura de Araraquara — Programa Novos Caminhos</small>
+  </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
-
