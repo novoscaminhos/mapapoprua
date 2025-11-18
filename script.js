@@ -281,7 +281,8 @@ const detailsExtraBlock = document.getElementById ? document.getElementById("det
 
 function setPanelState(state) {
   if (!detailsPanelEl) return;
-  detailsPanelEl.classList.remove("state-closed", "state-compact", "state-mid", "state-expanded");
+ detailsPanel.classList.remove("state-mid", "state-expanded", "state-closed");
+detailsPanel.classList.add("state-compact");
   switch (state) {
     case 'closed':
       detailsPanelEl.classList.add("state-closed");
@@ -667,4 +668,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // garante comportamento do painel fechado inicialmente
   setPanelState('closed');
 });
+
 
