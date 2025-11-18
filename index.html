@@ -5,9 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rede de Apoio — Araraquara / SP</title>
 
+  <!-- MANIFEST PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b5ed7">
+
+  <!-- Ícones -->
+  <link rel="icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Google Maps API -->
+  <!-- Google Maps -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap" async defer></script>
 
   <!-- MarkerClusterer -->
@@ -27,7 +35,6 @@
     </div>
 
     <div class="controls">
-
       <div class="search">
         <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
         <button id="btnClearSearch">✕</button>
@@ -39,14 +46,15 @@
 
       <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
 
+      <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
+
       <button id="togglePanel" class="panel-toggle">Filtros ▾</button>
     </div>
   </div>
 </header>
 
 <main class="container main-grid">
-
-  <!-- Painel lateral -->
+  
   <aside id="panel" class="panel">
     <h2>Filtros</h2>
     <div id="filters" class="filters"></div>
@@ -57,35 +65,30 @@
     <div id="listaLocais" class="lista"></div>
   </aside>
 
-  <!-- MAPA -->
   <section class="map-section">
     <div id="map" class="map"></div>
   </section>
 </main>
 
-<!-- Painel de detalhes (desliza do rodapé) -->
+<!-- Painel de Detalhes -->
 <div id="detailsPanel" class="details-panel hidden">
-  
-  <div class="details-header">
-    <div class="details-handle"></div>
-    <button id="closeDetails" class="close-details">✕</button>
-  </div>
+  <button id="closeDetails" class="close-details">✕</button>
 
   <div class="details-content">
-    <img id="detailsPhoto" class="details-photo" src="" alt="Foto do local">
+    <img id="detailsPhoto" class="details-photo" src="" alt="">
 
     <h2 id="detailsName"></h2>
-    <p class="details-cat" id="detailsCategory"></p>
-    
+    <p id="detailsCategory"></p>
     <p id="detailsAddress"></p>
     <p id="detailsDetails"></p>
     <p id="detailsPhone"></p>
     <p id="detailsHours"></p>
     <p id="detailsDistance"></p>
 
+    <button id="routeBtn" class="route-btn">🧭 Ver rotas</button>
+
     <button id="detailsMoreBtn" class="details-more">Carregar mais detalhes</button>
   </div>
-
 </div>
 
 <footer class="site-footer">
@@ -95,5 +98,13 @@
 </footer>
 
 <script src="script.js"></script>
+
+<!-- Service Worker -->
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
 </body>
 </html>
