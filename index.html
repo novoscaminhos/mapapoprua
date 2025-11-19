@@ -2,43 +2,27 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rede de Apoio — Araraquara / SP</title>
 
-  <!-- MANIFEST PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b5ed7">
 
-  <!-- Ícones -->
   <link rel="icon" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Estilos -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Google Maps API -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"
-    defer
-  ></script>
-
-  <!-- MarkerClusterer -->
-  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js" defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap" async defer></script>
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 </head>
 <body>
-
-<!-- =========================================================
-     HEADER — LINHAS 1 A 4
-     ========================================================= -->
 <header class="site-header">
   <div id="menuOverlay" class="menu-overlay hidden"></div>
 
   <div class="header-inner">
-
-    <!-- Linha 1 -->
     <div class="header-line1">Rede de Apoio —</div>
 
-    <!-- Linha 2 + Linha 3 -->
     <div class="header-line2-3">
       <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
       <div class="header-title-block">
@@ -47,29 +31,18 @@
       </div>
     </div>
 
-    <!-- Linha 4 -->
     <div class="header-line4">
       <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">☰</button>
       <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
       <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
     </div>
-
   </div>
 </header>
 
-<!-- =========================================================
-     LAYOUT PRINCIPAL
-     ========================================================= -->
 <div class="container">
-
   <div class="main-grid">
 
-    <!-- =========================================================
-         PAINEL LATERAL
-         ========================================================= -->
     <aside id="panel" class="panel">
-
-      <!-- Filtros -->
       <div class="filters">
         <label class="filter-item">
           <input type="checkbox" value="acolhimento" checked>
@@ -98,14 +71,9 @@
 
       <hr>
 
-      <!-- Lista de locais -->
       <div id="listaLocais" class="lista"></div>
-
     </aside>
 
-    <!-- =========================================================
-         MAPA
-         ========================================================= -->
     <section class="map-section">
       <div id="map" class="map"></div>
     </section>
@@ -113,21 +81,16 @@
   </div>
 </div>
 
-<!-- =========================================================
-     BOTTOM SHEET — DETALHES DO LOCAL
-     ========================================================= -->
 <div id="detailsPanel" class="details-panel state-closed">
-
-  <!-- Handle superior -->
   <div class="sheet-handle">
     <div class="handle-bar"></div>
   </div>
 
-  <button id="closeDetails" class="close-details" aria-label="Fechar detalhes">×</button>
+  <button id="closeDetails" class="close-details">×</button>
 
   <div class="details-content">
     <h2 id="detailsName"></h2>
-    <img id="detailsPhoto" class="details-photo" src="" alt="Foto do local">
+    <img id="detailsPhoto" class="details-photo" src="" alt="">
     <p id="detailsDescription"></p>
     <p id="detailsAddress"></p>
     <p id="detailsPhone"></p>
@@ -142,24 +105,16 @@
       <p id="detailsObservacoes"></p>
     </div>
   </div>
-
 </div>
 
-<!-- =========================================================
-     FOOTER
-     ========================================================= -->
 <footer class="site-footer">
   <div class="container">
     <small>&copy; 2025 Prefeitura de Araraquara — Programa Novos Caminhos</small>
   </div>
 </footer>
 
-<!-- =========================================================
-     SCRIPTS
-     ========================================================= -->
-<script src="script.js" defer></script>
+<script src="script.js"></script>
 
-<!-- Service Worker -->
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
