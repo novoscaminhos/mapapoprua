@@ -85,6 +85,8 @@
 
 <!-- Painel de Detalhes (BOTTOM SHEET) -->
 <div id="detailsPanel" class="details-panel hidden" role="dialog" aria-hidden="true" aria-label="Detalhes do local">
+  
+  <!-- Handle para arrastar -->
   <div id="sheetHandle" class="sheet-handle" title="Arraste para cima para ver mais">
     <div class="handle-bar"></div>
   </div>
@@ -92,7 +94,6 @@
   <button id="closeDetails" class="close-details" aria-label="Fechar">✕</button>
 
   <div class="details-content">
-    <img id="detailsPhoto" class="details-photo" src="" alt="">
 
     <h2 id="detailsName"></h2>
     <p id="detailsCategory"></p>
@@ -102,19 +103,15 @@
     <p id="detailsHours"></p>
     <p id="detailsDistance"></p>
 
+    <!-- Botões ficam ANTES da foto -->
     <button id="routeBtn" class="route-btn">🧭 Ver rotas</button>
-
     <button id="detailsMoreBtn" class="details-more">Carregar mais detalhes</button>
 
-
-    <!-- Bloco extra oculto por padrão, será exibido ao clicar em "Carregar mais detalhes" -->
-    <div id="detailsExtraBlock" class="details-extra-block hidden">
-      <!-- Espaço para informações adicionais / futura integração -->
-      <p id="detailsExtraText">Informações adicionais serão exibidas aqui.</p>
-      <!-- Exemplo: links, histórico, contatos, observações -->
-    </div>
+    <!-- FOTO AGORA FICA AQUI -->
+    <img id="detailsPhoto" class="details-photo" src="" alt="">
   </div>
 </div>
+
 
 <footer class="site-footer">
   <div class="container">
@@ -133,4 +130,5 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
