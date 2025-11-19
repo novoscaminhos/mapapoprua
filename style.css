@@ -1,13 +1,16 @@
-/* Arquivo style.css revisado — Correções estruturais, organização e limpeza
-   Mantive toda a lógica visual, mas corrigi conflitos, redundâncias, 
-   inconsistências e melhorei responsividade e acessibilidade. */
+/* ===========================================================
+   STYLE.CSS — Versão final, otimizada, profissional e completa
+   Mantém toda a robustez visual do app, mas com estrutura,
+   consistência, responsividade e acessibilidade refinadas.
+   =========================================================== */
 
 :root {
   --bg: #f6f7f9;
   --primary: #0b5ed7;
+  --primary-dark: #094ab0;
   --muted: #6c757d;
   --panel: #ffffff;
-  --shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+  --shadow: 0 6px 18px rgba(20,20,20,0.08);
   --radius: 12px;
   --transition: 0.28s ease;
 }
@@ -33,7 +36,9 @@ html, body {
   padding: 0 16px;
 }
 
-/* ---------------------- HEADER ---------------------- */
+/* ===========================================================
+   HEADER
+   =========================================================== */
 
 .site-header {
   background: white;
@@ -84,7 +89,9 @@ html, body {
   flex-wrap: wrap;
 }
 
-/* ---------------------- BOTÕES ---------------------- */
+/* ===========================================================
+   BOTÕES
+   =========================================================== */
 
 .geo-btn,
 .nearby-btn,
@@ -97,12 +104,13 @@ html, body {
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition);
+  user-select: none;
 }
 
 .geo-btn:hover,
 .nearby-btn:hover,
 .hamburger-btn:hover {
-  background: #094ab0;
+  background: var(--primary-dark);
 }
 
 .hamburger-btn {
@@ -110,9 +118,14 @@ html, body {
   width: 46px;
   height: 40px;
   padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ---------------------- GRID ---------------------- */
+/* ===========================================================
+   GRID PRINCIPAL
+   =========================================================== */
 
 .main-grid {
   display: grid;
@@ -127,7 +140,9 @@ html, body {
   }
 }
 
-/* ---------------------- PAINEL ---------------------- */
+/* ===========================================================
+   PAINEL LATERAL
+   =========================================================== */
 
 .panel {
   background: var(--panel);
@@ -149,6 +164,7 @@ html, body {
     height: 100vh;
     transform: translateX(-100%);
     z-index: 200;
+    border-radius: 0;
   }
   .panel.open {
     transform: translateX(0);
@@ -162,9 +178,12 @@ html, body {
   backdrop-filter: blur(2px);
   z-index: 190;
 }
+
 .hidden { display: none; }
 
-/* ---------------------- FILTROS ---------------------- */
+/* ===========================================================
+   FILTROS
+   =========================================================== */
 
 .filters {
   display: flex;
@@ -189,7 +208,9 @@ html, body {
   border-radius: 50%;
 }
 
-/* ---------------------- LISTA ---------------------- */
+/* ===========================================================
+   LISTA
+   =========================================================== */
 
 .lista {
   display: flex;
@@ -203,23 +224,28 @@ html, body {
   border-radius: 8px;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .lista-item:hover {
   transform: scale(1.03);
 }
 
-/* ---------------------- MAPA ---------------------- */
+/* ===========================================================
+   MAPA
+   =========================================================== */
 
 .map {
   width: 100%;
   height: 80vh;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-/* ---------------------- DETALHES (BOTTOM SHEET) ---------------------- */
+/* ===========================================================
+   BOTTOM SHEET — DETALHES
+   =========================================================== */
 
 .details-panel {
   position: fixed;
@@ -237,6 +263,7 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  will-change: transform, height;
 }
 
 .sheet-handle {
@@ -246,8 +273,11 @@ html, body {
   justify-content: center;
   cursor: grab;
   padding: 8px 0 6px;
+  user-select: none;
 }
-.sheet-handle:active { cursor: grabbing; }
+.sheet-handle:active {
+  cursor: grabbing;
+}
 
 .handle-bar {
   width: 56px;
@@ -293,11 +323,12 @@ html, body {
   font-size: 16px;
   border-radius: 10px;
   cursor: pointer;
+  transition: var(--transition);
 }
 
 .details-more:hover,
 .route-btn:hover {
-  background: #094ab0;
+  background: var(--primary-dark);
 }
 
 .details-extra-block {
@@ -338,7 +369,9 @@ html, body {
   overflow: auto;
 }
 
-/* ---------------------- FOOTER ---------------------- */
+/* ===========================================================
+   FOOTER
+   =========================================================== */
 
 .site-footer {
   padding: 18px 0;
@@ -346,7 +379,10 @@ html, body {
   color: var(--muted);
 }
 
-/* Desktop ajustes */
+/* ===========================================================
+   DESKTOP AJUSTES
+   =========================================================== */
+
 @media (min-width: 900px) {
   .header-inner {
     align-items: flex-start;
@@ -360,6 +396,7 @@ html, body {
   .header-line4 {
     margin-top: 4px;
   }
+
   .details-panel.state-compact { height: 140px; }
   .details-panel.state-mid { height: 320px; }
   .details-panel.state-expanded { height: 75vh; }
