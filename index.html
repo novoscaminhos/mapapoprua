@@ -1,41 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
   <title>Rede de Apoio — Araraquara / SP</title>
 
-  <link rel="manifest" href="/mapapoprua/manifest.json" />
+  <!-- MANIFEST PWA -->
+  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0b5ed7">
 
   <!-- Ícones -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/mapapoprua/icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="/mapapoprua/icon-192.png">
+  <link rel="icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
-  <link rel="stylesheet" href="/mapapoprua/style.css" />
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- Google Maps (defer garante ordem e evita erro initMap) -->
-  <script src="/mapapoprua/script.js" defer></script>
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap"></script>
-  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+  <!-- Google Maps -->
+  <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap&loading=async" 
+    async defer>
+  </script>
+
+  <!-- MarkerClusterer local -->
+  <script src="markerclusterer.min.js"></script>
 </head>
-
 <body>
 
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
 <header class="site-header">
   <div id="menuOverlay" class="menu-overlay hidden"></div>
 
   <div class="header-inner">
+
     <div class="header-line1">Rede de Apoio —</div>
 
     <div class="header-line2-3">
-      <img src="/mapapoprua/logo_comite.png" class="logo" alt="Logo Comitê" />
+      <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
       <div class="header-title-block">
         <h1>População em Situação de Rua</h1>
         <p class="subtitle-big">Araraquara/SP — Serviços, apoio e doações</p>
@@ -43,20 +46,53 @@
     </div>
 
     <div class="header-line4">
-      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">☰</button>
+      <button id="menuBtn" class="hamburger-btn">☰</button>
       <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
       <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
     </div>
+
   </div>
 </header>
 
+<!-- =========================================================
+     LAYOUT PRINCIPAL
+     ========================================================= -->
 <div class="container">
+
   <div class="main-grid">
 
     <aside id="panel" class="panel">
-      <div id="filters" class="filters"></div>
+
+      <div class="filters">
+        <label class="filter-item">
+          <input type="checkbox" value="acolhimento" checked>
+          <span class="dot" style="background:#0b5ed7"></span>
+          Acolhimento
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="alimentacao" checked>
+          <span class="dot" style="background:#28a745"></span>
+          Alimentação
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="saude" checked>
+          <span class="dot" style="background:#dc3545"></span>
+          Saúde
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="assistencia" checked>
+          <span class="dot" style="background:#ffc107"></span>
+          Assistência Social
+        </label>
+      </div>
+
       <hr>
+
       <div id="listaLocais" class="lista"></div>
+
     </aside>
 
     <section class="map-section">
@@ -66,41 +102,30 @@
   </div>
 </div>
 
-<div id="detailsPanel" class="details-panel state-closed">
-  <div id="sheetHandle" class="sheet-handle">
-    <div class="handle-bar"></div>
-  </div>
-
-  <button id="closeDetails" class="close-details">×</button>
-
-  <div class="details-content">
-    <h2 id="detailsName"></h2>
-
-    <img id="detailsPhoto" class="details-photo" src="" alt="Foto do local">
-
-    <p id="detailsCategory"></p>
-    <p id="detailsAddress"></p>
-    <p id="detailsDetails"></p>
-    <p id="detailsPhone"></p>
-    <p id="detailsHours"></p>
-    <p id="detailsDistance"></p>
-
-    <button id="routeBtn" class="route-btn">📍 Traçar rota</button>
-    <button id="detailsMore" class="details-more">Mais detalhes</button>
-
-    <div id="detailsExtraBlock" class="details-extra-block hidden" style="display:none;"></div>
-  </div>
+<!-- =========================================================
+     BOTTOM PANEL (compatível com script.js)
+     ========================================================= -->
+<div id="bottom-panel" class="bottom-panel">
+  <!-- preenchido dinamicamente -->
 </div>
 
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
 <footer class="site-footer">
   <div class="container">
     <small>&copy; 2025 Prefeitura de Araraquara — Programa Novos Caminhos</small>
   </div>
 </footer>
 
+<!-- =========================================================
+     SCRIPTS
+     ========================================================= -->
+<script src="script.js"></script>
+
 <script>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/mapapoprua/service-worker.js");
+    navigator.serviceWorker.register("service-worker.js");
   }
 </script>
 
