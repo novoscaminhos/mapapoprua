@@ -1,6 +1,6 @@
 /* ============================================================
    MAPA POP RUA – SCRIPT PRINCIPAL
-   Versão corrigida + carregamento correto do dados.json
+   Versão corrigida + compatível com dados.json
    ============================================================ */
 
 let map;
@@ -13,10 +13,8 @@ let activeMarker = null;
 // ================================
 async function loadData() {
     try {
-        const response = await fetch("dados.json");  // <-- CORRETO
-        if (!response.ok) {
-            throw new Error("Não foi possível carregar dados.json");
-        }
+        const response = await fetch("dados.json");
+        if (!response.ok) throw new Error("Não foi possível carregar dados.json");
         infoData = await response.json();
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
@@ -31,10 +29,17 @@ function updateBottomPanel(local) {
     if (!panel) return;
 
     panel.innerHTML = `
-        <h2>${local.nome}</h2>
-        <p><strong>Endereço:</strong> ${local.endereco}</p>
-        <p><strong>Categoria:</strong> ${local.tipo}</p>
-        ${local.obs ? `<p><strong>Observações:</strong> ${local.obs}</p>` : ""}
+        <h2>${local.name}</h2>
+
+        ${local.address ? `<p><strong>Endereço:</strong> ${local.address}</p>` : ""}
+
+        ${local.category ? `<p><strong>Categoria:</strong> ${local.category}</p>` : ""}
+
+        ${local.details ? `<p><strong>Detalhes:</strong> ${local.details}</p>` : ""}
+
+        ${local.phone ? `<p><strong>Telefone:</strong> ${local.phone}</p>` : ""}
+
+        ${local.hours ? `<p><strong>Funcionamento:</strong> ${local.hours}</p>` : ""}
     `;
 
     panel.classList.add("visible");
@@ -48,21 +53,20 @@ function clearBottomPanel() {
 }
 
 // ================================
-// 3) Criar Marcadores
+// 3) Criar Marcadores (SEM CLUSTERER)
 // ================================
 function createMarkers() {
-    const customIcon = {
-        url: "icons/pin.png",
-        scaledSize: new google.maps.Size(45, 45),
-        anchor: new google.maps.Point(22, 45),
+    const iconConfig = {
+        url: null,   // Ícone padrão do Google Maps
+        scaledSize: new google.maps.Size(40, 40),
     };
 
     infoData.forEach((local) => {
         const marker = new google.maps.Marker({
             position: { lat: local.lat, lng: local.lng },
             map,
-            icon: customIcon,
-            title: local.nome
+            icon: iconConfig.url ? iconConfig : null,
+            title: local.name
         });
 
         marker.addListener("click", () => {
@@ -72,12 +76,6 @@ function createMarkers() {
 
         markers.push(marker);
     });
-
-    // Clustering
-    new markerClusterer.MarkerClusterer({
-        map: map,
-        markers: markers
-    });
 }
 
 // ================================
@@ -86,9 +84,9 @@ function createMarkers() {
 window.initMap = async function () {
     await loadData();
 
-    // Centraliza na região desejada
+    // Centraliza Araraquara
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -21.784, lng: -48.178 }, // Araraquara/SP
+        center: { lat: -21.784, lng: -48.178 },
         zoom: 13,
         gestureHandling: "greedy",
         mapId: "MAPA_POP_RUA",
@@ -101,6 +99,9 @@ window.initMap = async function () {
     });
 };
 
+// ================================
+// 5) DOM READY
+// ================================
 window.addEventListener("DOMContentLoaded", () => {
     console.log("DOM carregado, aguardando Google Maps...");
 });
