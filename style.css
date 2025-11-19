@@ -395,67 +395,107 @@ html, body {
   .site-header {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 15px 0;
+    gap: 4px;
+    padding: 16px 0 10px 0;
   }
 
   .header-inner {
+    width: 100%;
+    display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     align-items: flex-start;
   }
 
-  /* Linha superior: menu + logo + título */
-  .header-top {
+  /* Linha 1 — título curto */
+  .header-line1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  /* Linha 2 e 3 — logo + título quebrado */
+  .header-line2-3 {
     display: flex;
     align-items: center;
     gap: 14px;
   }
 
-  .brand {
+  .header-line2-3 .logo {
+    width: 58px;
+    height: 58px;
+  }
+
+  .header-title-block h1 {
+    font-size: 20px;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .header-title-block .subtitle-big {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Linha 4 — menu + botões */
+  .header-line4 {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    margin-top: 4px;
   }
 
-  /* Ícone do menu à esquerda */
+  /* hambúrguer alinhado ao logo */
   #menuBtn {
-    order: -1;
-    margin-right: 6px;
+    width: 46px;
+    height: 40px;
+    font-size: 22px;
+    padding: 0;
   }
 
-  /* Linha inferior: botões */
-  .header-actions {
+  .geo-btn,
+  .nearby-btn {
+    padding: 8px 14px;
+  }
+}
+
+
+/* ======================================
+   MOBILE — hambúrguer abaixo do logo
+   ====================================== */
+@media (max-width: 900px) {
+
+  .header-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  /* Quebra correta das linhas */
+  .header-line1 { font-size: 18px; font-weight: 700; }
+
+  .header-line2-3 {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .header-line2-3 .logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  #menuBtn {
+    margin-left: 2px;
+    margin-top: 4px;
+  }
+
+  .header-line4 {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    padding-left: 58px; /* alinha com o logo */
-  }
-
-  /* Ajuste opcional do logo */
-  .brand .logo {
-    width: 60px;
-    height: 60px;
+    margin-left: 2px;
   }
 }
-
-/* MOBILE — Colocar o hambúrguer abaixo do logo */
-@media (max-width: 900px) {
-
-  .site-header .header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .hamburger-btn {
-    align-self: flex-start;
-    margin-left: 4px;
-  }
-
-  /* Texto Araraquara/SP fica mais colado ao hambúrguer */
-  .subtitle {
-    margin-top: -4px;
-  }
-}
-
