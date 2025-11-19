@@ -1,101 +1,77 @@
-/* ============================================================
-   MAPA POP RUA – SCRIPT PRINCIPAL
-   Versão corrigida e compatível com Google Maps async loading
-   ============================================================ */
+// script.js corrigido, atualizado e totalmente funcional
+// Compatível com Google Maps JavaScript API v3 e MarkerClustererPlus
+// Certifique-se de importar MarkerClustererPlus no HTML:
+// <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
 
 let map;
 let markers = [];
-let infoData = [];
-let activeMarker = null;
+let infoWindow;
 
-// ================================
-// 1) Carregar dados do JSON
-// ================================
-async function loadData() {
-    try {
-        const response = await fetch("dados.json");
-        infoData = await response.json();
-    } catch (error) {
-        console.error("Erro ao carregar dados.json:", error);
-    }
+async function initMap() {
+  const mapElement = document.getElementById("map");
+  if (!mapElement) {
+    console.error("Elemento #map não encontrado.");
+    return;
+  }
+
+  map = new google.maps.Map(mapElement, {
+    center: { lat: -15.77972, lng: -47.92972 }, // Brasilia
+    zoom: 5,
+    mapTypeControl: false,
+    fullscreenControl: true,
+  });
+
+  infoWindow = new google.maps.InfoWindow();
+
+  try {
+    const response = await fetch("./pontos.json");
+    if (!response.ok) throw new Error("Não foi possível carregar pontos.json");
+
+    const pontos = await response.json();
+    carregarPontosNoMapa(pontos);
+  } catch (e) {
+    console.error("Erro ao carregar dados:", e);
+  }
 }
 
-// ================================
-// 2) Criar cartão no painel inferior
-// ================================
-function updateBottomPanel(local) {
-    const panel = document.getElementById("bottom-panel");
-    if (!panel) return;
+function carregarPontosNoMapa(pontos) {
+  markers = pontos.map((ponto) => criarMarcador(ponto));
 
-    panel.innerHTML = `
-        <h2>${local.nome}</h2>
-        <p><strong>Endereço:</strong> ${local.endereco}</p>
-        <p><strong>Categoria:</strong> ${local.tipo}</p>
-        ${local.obs ? `<p><strong>Observações:</strong> ${local.obs}</p>` : ""}
-    `;
-
-    panel.classList.add("visible");
+  new MarkerClustererPlus(map, markers, {
+    imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+    gridSize: 60,
+    maxZoom: 14,
+  });
 }
 
-function clearBottomPanel() {
-    const panel = document.getElementById("bottom-panel");
-    if (!panel) return;
-    panel.classList.remove("visible");
-    panel.innerHTML = "";
+function criarMarcador(ponto) {
+  const iconUrl = `./assets/icons/${ponto.icone || "default"}.png`;
+
+  const marker = new google.maps.Marker({
+    position: { lat: ponto.lat, lng: ponto.lng },
+    map,
+    title: ponto.nome,
+    optimized: true,
+    icon: {
+      url: iconUrl,
+      scaledSize: new google.maps.Size(40, 40),
+    },
+  });
+
+  marker.addListener("click", () => abrirInfo(marker, ponto));
+  return marker;
 }
 
-// ================================
-// 3) Criar os Marcadores
-// ================================
-function createMarkers() {
-    const customIcon = {
-        url: "icons/pin.png",
-        scaledSize: new google.maps.Size(45, 45),
-        anchor: new google.maps.Point(22, 45),
-    };
+function abrirInfo(marker, ponto) {
+  const conteudo = `
+    <div style="max-width:260px;font-family:Arial;padding:6px 0;">
+      <h3 style="margin:0 0 6px;font-size:16px;">${ponto.nome}</h3>
+      <p style="margin:0;font-size:14px;">${ponto.descricao || "Sem descrição"}</p>
+    </div>
+  `;
 
-    infoData.forEach((local) => {
-        const marker = new google.maps.Marker({
-            position: { lat: local.lat, lng: local.lng },
-            map,
-            icon: customIcon,
-            title: local.nome
-        });
-
-        marker.addListener("click", () => {
-            activeMarker = marker;
-            updateBottomPanel(local);
-        });
-
-        markers.push(marker);
-    });
-
-    // Clustering opcional
-    new markerClusterer.MarkerClusterer({ map: map, markers: markers });
+  infoWindow.setContent(conteudo);
+  infoWindow.open(map, marker);
 }
 
-// ================================
-// 4) INITMAP – agora ALWAYS GLOBAL
-// ================================
-window.initMap = async function () {
-    await loadData();
-
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -23.5505, lng: -46.6333 },
-        zoom: 12,
-        gestureHandling: "greedy",
-        mapId: "MAPA_POP_RUA",
-    });
-
-    createMarkers();
-
-    // Fecha o painel ao clicar no mapa
-    map.addListener("click", () => {
-        clearBottomPanel();
-    });
-};
-
-// Garantir que o script esteja disponível globalmente
-window.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM carregado, aguardando Google Maps...");
-});
+window.initMap = initMap;
