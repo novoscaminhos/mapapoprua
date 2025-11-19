@@ -26,46 +26,25 @@
 <header class="site-header">
   <div id="menuOverlay" class="menu-overlay hidden"></div>
 
-  <div class="container header-inner">
+  <div class="header-inner">
 
-    <!-- Linha 1: título superior -->
-    <div class="header-line1">
-      <h1 class="header-title-top">Rede de Apoio —</h1>
-    </div>
+    <!-- Linha 1 -->
+    <div class="header-line1">Rede de Apoio —</div>
 
-    <!-- Linha 2 + 3: logo + textos centrais -->
+    <!-- Linha 2 + Linha 3 -->
     <div class="header-line2-3">
       <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
-
-      <div class="header-text-block">
-        <span class="header-text-line2">População em Situação</span>
-        <span class="header-text-line3">de Rua — Araraquara/SP</span>
+      <div class="header-title-block">
+        <h1>População em Situação de Rua</h1>
+        <p class="subtitle-big">Araraquara/SP — Serviços, apoio e doações</p>
       </div>
     </div>
 
-    <!-- Linha 4: menu + botões -->
+    <!-- Linha 4 -->
     <div class="header-line4">
-
-      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">
-        ☰
-      </button>
-
-      <div class="controls">
-
-        <!-- inputs continuam ocultos -->
-        <div class="search">
-          <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
-          <button id="btnClearSearch">✕</button>
-        </div>
-
-        <div class="search-bairro">
-          <input id="bairroBox" type="search" placeholder="Buscar por bairro..." />
-        </div>
-
-        <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
-        <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
-
-      </div>
+      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">☰</button>
+      <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
+      <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
     </div>
 
   </div>
@@ -88,4 +67,5 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
