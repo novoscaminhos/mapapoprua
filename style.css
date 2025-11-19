@@ -1,7 +1,5 @@
 /* ===========================================================
-   STYLE.CSS — Versão final, otimizada, profissional e completa
-   Mantém toda a robustez visual do app, mas com estrutura,
-   consistência, responsividade e acessibilidade refinadas.
+   STYLE.CSS — Versão corrigida para compatibilidade total
    =========================================================== */
 
 :root {
@@ -245,9 +243,10 @@ html, body {
 
 /* ===========================================================
    BOTTOM SHEET — DETALHES
+   (agora corrigido para #bottom-panel)
    =========================================================== */
 
-.details-panel {
+#bottom-panel {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -339,33 +338,33 @@ html, body {
   box-shadow: 0 6px 18px rgba(11,94,215,0.06);
 }
 
-/* Estados do bottom sheet */
-.details-panel.state-closed {
+/* Estados */
+#bottom-panel.state-closed {
   transform: translateY(110%);
   height: 0;
   pointer-events: none;
 }
 
-.details-panel.state-compact {
+#bottom-panel.state-compact {
   transform: translateY(0);
   height: 15vh;
   pointer-events: auto;
 }
 
-.details-panel.state-mid {
+#bottom-panel.state-mid {
   transform: translateY(0);
   height: 45vh;
   pointer-events: auto;
 }
 
-.details-panel.state-expanded {
+#bottom-panel.state-expanded {
   transform: translateY(0);
   height: 85vh;
   pointer-events: auto;
 }
 
-.details-panel.state-mid .details-content,
-.details-panel.state-expanded .details-content {
+#bottom-panel.state-mid .details-content,
+#bottom-panel.state-expanded .details-content {
   overflow: auto;
 }
 
@@ -397,7 +396,7 @@ html, body {
     margin-top: 4px;
   }
 
-  .details-panel.state-compact { height: 140px; }
-  .details-panel.state-mid { height: 320px; }
-  .details-panel.state-expanded { height: 75vh; }
+  #bottom-panel.state-compact { height: 140px; }
+  #bottom-panel.state-mid { height: 320px; }
+  #bottom-panel.state-expanded { height: 75vh; }
 }
