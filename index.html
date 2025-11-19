@@ -28,32 +28,37 @@
 
   <div class="container header-inner">
 
-    <!-- Linha superior: menu + logo + título -->
-    <div class="header-top">
-      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">☰</button>
+    <!-- Linha 1: título superior -->
+    <div class="header-line1">
+      <h1 class="header-title-top">Rede de Apoio —</h1>
+    </div>
 
-      <div class="brand">
-        <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
-        <div>
-          <h1>Rede de Apoio — População em Situação de Rua</h1>
-          <p class="subtitle">Araraquara / SP — Serviços, apoio e doações</p>
-        </div>
+    <!-- Linha 2 + 3: logo + textos centrais -->
+    <div class="header-line2-3">
+      <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
+
+      <div class="header-text-block">
+        <span class="header-text-line2">População em Situação</span>
+        <span class="header-text-line3">de Rua — Araraquara/SP</span>
       </div>
     </div>
 
-    <!-- Linha inferior: botões e campos ocultos -->
-    <div class="header-actions">
+    <!-- Linha 4: menu + botões -->
+    <div class="header-line4">
+
+      <button id="menuBtn" class="hamburger-btn" aria-label="Abrir menu">
+        ☰
+      </button>
 
       <div class="controls">
 
+        <!-- inputs continuam ocultos -->
         <div class="search">
-          <!-- Mantive o input (oculto via CSS) para integrações futuras -->
           <input id="searchBox" type="search" placeholder="Pesquisar nome ou endereço..." />
           <button id="btnClearSearch">✕</button>
         </div>
 
         <div class="search-bairro">
-          <!-- Mantido, oculto via CSS -->
           <input id="bairroBox" type="search" placeholder="Buscar por bairro..." />
         </div>
 
@@ -65,53 +70,6 @@
 
   </div>
 </header>
-
-<main class="container main-grid">
-  
-  <aside id="panel" class="panel">
-    <h2>Filtros</h2>
-    <div id="filters" class="filters"></div>
-
-    <hr />
-
-    <h2>Lista de Locais</h2>
-    <div id="listaLocais" class="lista"></div>
-  </aside>
-
-  <section class="map-section">
-    <div id="map" class="map"></div>
-  </section>
-</main>
-
-<!-- Painel de Detalhes (BOTTOM SHEET) -->
-<div id="detailsPanel" class="details-panel hidden" role="dialog" aria-hidden="true" aria-label="Detalhes do local">
-  
-  <!-- Handle para arrastar -->
-  <div id="sheetHandle" class="sheet-handle" title="Arraste para cima para ver mais">
-    <div class="handle-bar"></div>
-  </div>
-
-  <button id="closeDetails" class="close-details" aria-label="Fechar">✕</button>
-
-  <div class="details-content">
-
-    <h2 id="detailsName"></h2>
-    <p id="detailsCategory"></p>
-    <p id="detailsAddress"></p>
-    <p id="detailsDetails"></p>
-    <p id="detailsPhone"></p>
-    <p id="detailsHours"></p>
-    <p id="detailsDistance"></p>
-
-    <!-- Botões ficam ANTES da foto -->
-    <button id="routeBtn" class="route-btn">🧭 Ver rotas</button>
-    <button id="detailsMoreBtn" class="details-more">Carregar mais detalhes</button>
-
-    <!-- FOTO AGORA FICA AQUI -->
-    <img id="detailsPhoto" class="details-photo" src="" alt="">
-  </div>
-</div>
-
 
 <footer class="site-footer">
   <div class="container">
@@ -130,5 +88,4 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
 
