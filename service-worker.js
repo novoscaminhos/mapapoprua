@@ -1,6 +1,6 @@
 /* ============================================================
-   SERVICE WORKER — Rede de Apoio Araraquara (GitHub Pages FIX)
-   Cache leve + seguro (não quebra navegação)
+   SERVICE WORKER — Rede de Apoio Araraquara
+   Cache offline (PWA)
    ============================================================ */
 
 const ROOT = "/mapapoprua/";
@@ -14,16 +14,20 @@ const ASSETS = [
   ROOT + "manifest.json",
   ROOT + "icon-192.png",
   ROOT + "icon-512.png",
-  ROOT + "placeholder.jpg"
+  ROOT + "favicon.png",
+  ROOT + "dados.json",
+  ROOT + "markerclusterer.min.js"
 ];
 
-/* INSTALL */
+/* INSTALAÇÃO */
 self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
 
-/* ACTIVATE */
+/* ATIVAÇÃO */
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -33,26 +37,15 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-/* FETCH (Network First for HTML, Cache First for assets) */
+/* FETCH — offline first */
 self.addEventListener("fetch", event => {
-  const request = event.request;
-
-  if (request.mode === "navigate") {
-    // HTML pages → sempre tenta baixar do servidor primeiro
-    event.respondWith(
-      fetch(request).catch(() => caches.match(ROOT + "index.html"))
-    );
-    return;
-  }
-
-  // Assets (CSS, JS, imagens)
   event.respondWith(
-    caches.match(request).then(resp => {
+    caches.match(event.request).then(resp => {
       return (
         resp ||
-        fetch(request).then(fetchResp => {
+        fetch(event.request).then(fetchResp => {
           return caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, fetchResp.clone());
+            cache.put(event.request, fetchResp.clone());
             return fetchResp;
           });
         })
