@@ -144,8 +144,8 @@ html, body {
 .main-grid {
   display: grid;
   grid-template-columns: 320px 1fr;
-  gap: 16px;
-  margin-top: 16px;
+  flex: 1;
+  min-height: 0; /* ESSENCIAL — permite que o mapa cresça */
 }
 
 @media (max-width: 900px) {
@@ -499,3 +499,4 @@ html, body {
     margin-left: 2px;
   }
 }
+
