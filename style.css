@@ -310,10 +310,11 @@ html, body {
 /* foto */
 .details-photo {
   width: 100%;
+  height: auto;
   border-radius: 12px;
-  height: 180px;
+  margin-top: 12px;
   object-fit: cover;
-  background: #ddd;
+  max-height: 220px;
 }
 
 /* botões */
@@ -457,3 +458,4 @@ html, body {
     margin-top: -4px;
   }
 }
+
