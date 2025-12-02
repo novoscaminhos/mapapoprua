@@ -58,5 +58,15 @@
     "hours": "",
     "lat": -21.7788367,
     "lng": -48.1921867
+  },
+    {
+    "name": "Centro de Referência Afro Mestre Jorge",
+    "category": "Pontos de doação",
+    "address": "Avenida Mauá, 377 - Centro",
+    "details": "",
+    "phone": "",
+    "hours": "",
+    "lat": -21.78489,
+    "lng": -48.175
   }
 ]
