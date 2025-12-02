@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Centro Pop",
+        "address": "Av. José Bonifácio, 576 - Centro, Araraquara - SP",
+        "lat": -21.791500,
+        "lng": -48.173900,
+        "category": "servicos",
+        "details": "Serviço especializado para pessoas em situação de rua. Oferece alimentação, higiene, atendimento social e acompanhamento técnico. Horário de funcionamento: 8h às 17h."
+    },
+    {
+        "name": "Casa de acolhida \"Assad-Kan\"",
+        "address": "R. Castro Alves, 2697 - Vila Santana, Araraquara - SP",
+        "lat": -21.799300,
+        "lng": -48.163400,
+        "category": "servicos",
+        "details": "Oferece acolhimento institucional para adultos em situação de rua. O acesso é feito via Centro Pop ou demanda espontânea. Funciona 24 horas."
+    },
+    {
+        "name": "CRAS Central",
+        "address": "R. João Gurgel, 1940 - Centro, Araraquara - SP",
+        "lat": -21.791541,
+        "lng": -48.173981,
+        "category": "servicos",
+        "details": "Centro de Referência de Assistência Social. Responsável por organizar e ofertar serviços socioassistenciais de proteção social básica. Necessário agendamento."
+    },
+    {
+        "name": "Associação São Pio (masculino)",
+        "address": "R. São Bento, 2500 - Centro, Araraquara - SP",
+        "lat": -21.824324,
+        "lng": -48.203819,
+        "category": "apoio",
+        "details": "Ponto de apoio e parceria para a população. Oferece serviços de apoio espiritual e material. Consulte horários de atendimento."
+    },
+    {
+        "name": "Associação São Pio (feminina)",
+        "address": "Av. Brasil, 1500 - Centro, Araraquara - SP",
+        "lat": -21.766560,
+        "lng": -48.178260,
+        "category": "apoio",
+        "details": "Ponto de apoio e parceria focado no público feminino. Oferece suporte e orientação. Consulte horários de atendimento."
+    },
+    {
+        "name": "Fundo Social de Solidariedade",
+        "address": "R. Imac. Conceição, 3885 - Vila Yamada, Araraquara - SP",
+        "lat": -21.775800,
+        "lng": -48.163100,
+        "category": "doacao",
+        "details": "Local de recebimento e distribuição de doações (roupas, alimentos, cobertores). Verifique os dias e horários para entrega de doações."
+    }
+]
