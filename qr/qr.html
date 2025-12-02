@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>QR Code — Mapa Rede de Apoio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 40px;
+}
+#qrcode {
+  margin: 20px auto;
+}
+</style>
+</head>
+<body>
+
+<h2>QR Code — Rede de Apoio</h2>
+<p>Aponte a câmera do celular</p>
+
+<div id="qrcode"></div>
+
+<script>
+// <<< COLOQUE AQUI O LINK DA PÁGINA FINAL >>>
+const url = "https://celbff.github.io/mapapoprua/";
+
+new QRCode(document.getElementById("qrcode"), {
+    text: url,
+    width: 260,
+    height: 260
+});
+</script>
+
+</body>
+</html>

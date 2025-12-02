@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rede de Apoio — Araraquara / SP</title>
+
+  <!-- MANIFEST PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b5ed7">
+
+  <!-- Ícones -->
+  <link rel="icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Google Maps -->
+  <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQuuCXrPdCDEK-jsMfAfzEMD12GtJt0YU&callback=initMap&loading=async" 
+    async defer>
+  </script>
+
+  <!-- MarkerClusterer local -->
+  <script src="markerclusterer.min.js"></script>
+</head>
+<body>
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+<header class="site-header">
+  <div id="menuOverlay" class="menu-overlay hidden"></div>
+
+  <div class="header-inner">
+
+    <div class="header-line1">Rede de Apoio —</div>
+
+    <div class="header-line2-3">
+      <img src="logo_comite.png" class="logo" alt="Logo Comitê" />
+      <div class="header-title-block">
+        <h1>População em Situação de Rua</h1>
+        <p class="subtitle-big">Araraquara/SP — Serviços, apoio e doações</p>
+      </div>
+    </div>
+
+    <div class="header-line4">
+      <button id="menuBtn" class="hamburger-btn">☰</button>
+      <button id="geoBtn" class="geo-btn">📍 Minha localização</button>
+      <button id="nearbyBtn" class="nearby-btn">🔎 Locais próximos</button>
+    </div>
+
+  </div>
+</header>
+
+<!-- =========================================================
+     LAYOUT PRINCIPAL
+     ========================================================= -->
+<div class="container">
+
+  <div class="main-grid">
+
+    <aside id="panel" class="panel">
+
+      <div class="filters">
+        <label class="filter-item">
+          <input type="checkbox" value="acolhimento" checked>
+          <span class="dot" style="background:#0b5ed7"></span>
+          Acolhimento
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="alimentacao" checked>
+          <span class="dot" style="background:#28a745"></span>
+          Alimentação
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="saude" checked>
+          <span class="dot" style="background:#dc3545"></span>
+          Saúde
+        </label>
+
+        <label class="filter-item">
+          <input type="checkbox" value="assistencia" checked>
+          <span class="dot" style="background:#ffc107"></span>
+          Assistência Social
+        </label>
+      </div>
+
+      <hr>
+
+      <div id="listaLocais" class="lista"></div>
+
+    </aside>
+
+    <section class="map-section">
+      <div id="map" class="map"></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- =========================================================
+     BOTTOM PANEL (compatível com script.js)
+     ========================================================= -->
+<div id="bottom-panel" class="bottom-panel">
+  <!-- preenchido dinamicamente -->
+</div>
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+<footer class="site-footer">
+  <div class="container">
+    <small>&copy; 2025 Prefeitura de Araraquara — Programa Novos Caminhos</small>
+  </div>
+</footer>
+
+<!-- =========================================================
+     SCRIPTS
+     ========================================================= -->
+<script src="script.js"></script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+   navigator.serviceWorker.register("/mapapoprua/sw.js");
+  }
+</script>
+
+</body>
+</html>
+
